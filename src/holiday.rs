@@ -11,7 +11,7 @@ pub struct Holiday {
 }
 
 impl Holiday {
-    pub fn deserialize_from_csv(csv: &str) -> Result<Vec<Holiday>, crate::error::Error> {
+    pub fn deserialize_from_csv(csv: &str) -> Result<Vec<Self>, crate::error::Error> {
         let mut reader = csv::Reader::from_reader(csv.as_bytes());
         reader
             .deserialize()
