@@ -1,5 +1,7 @@
-FROM ubuntu:24.04
+FROM rust:latest
 
-RUN apt-get update -y && apt-get install vim -y && apt-get install git -y
+RUN apt-get update -y \
+    && cargo install cargo-binstall \
+    && cargo binstall cargo-watch 
 
 COPY .bashrc /root/.bashrc
