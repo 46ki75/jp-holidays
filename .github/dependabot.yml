@@ -5,3 +5,5 @@ updates:
     schedule:
       interval: "daily"
     target-branch: "develop"
+    assignees:
+      - "46ki75"
