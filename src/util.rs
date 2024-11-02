@@ -5,7 +5,6 @@ pub async fn fetch_csv(url: &str) -> Result<Vec<u8>, crate::error::Error> {
 }
 
 pub fn to_utf8(bytes: &[u8]) -> Result<String, crate::error::Error> {
-    println!("Debug: Input bytes: {:?}", bytes);
     let (decoded_str, _, had_errors) = encoding_rs::SHIFT_JIS.decode(bytes);
     if had_errors {
         Err(crate::error::Error::Decode(
