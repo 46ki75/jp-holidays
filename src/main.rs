@@ -13,7 +13,9 @@ async fn main() -> Result<(), error::Error> {
 
     let holidays = holiday::Holiday::deserialize_from_csv(&csv)?;
 
-    println!("{:?}", holidays);
+    let responses: Vec<response::Response> = holidays.into_iter().map(Into::into).collect();
+
+    println!("{:?}", responses);
 
     Ok(())
 }
