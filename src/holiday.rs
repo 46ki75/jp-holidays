@@ -3,10 +3,11 @@ use serde::Deserialize;
 #[derive(Deserialize, Debug)]
 pub struct Holiday {
     #[serde(rename = "国民の祝日・休日月日")]
-    date: String,
+    #[serde(with = "crate::date_format")]
+    date: chrono::NaiveDate,
 
     #[serde(rename = "国民の祝日・休日名称")]
-    name: String, // Changed from u8 to String
+    name: String,
 }
 
 impl Holiday {
