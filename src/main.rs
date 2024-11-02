@@ -1,4 +1,5 @@
 mod error;
+mod holiday;
 mod util;
 
 #[tokio::main]
@@ -8,7 +9,9 @@ async fn main() -> Result<(), error::Error> {
 
     let csv = util::to_utf8(&raw_csv_bytes)?;
 
-    println!("{}", csv);
+    let holidays = holiday::Holiday::deserialize_from_csv(&csv)?;
+
+    println!("{:?}", holidays);
 
     Ok(())
 }
