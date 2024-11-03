@@ -2,6 +2,7 @@ mod date_format;
 mod error;
 mod holiday;
 mod response;
+mod response_list;
 mod util;
 
 use chrono::NaiveDate;
@@ -62,6 +63,10 @@ async fn main() -> Result<(), error::Error> {
     }
 
     println!("{} ~ {}", first_date, last_date);
+
+    let response_list = response_list::ResponseList::from(holidays);
+
+    response_list.save(ROOT_DIR)?;
 
     Ok(())
 }
