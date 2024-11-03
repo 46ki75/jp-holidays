@@ -1,0 +1,23 @@
+{
+  "name": "Dev Container",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {},
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "Gruntfuggly.todo-tree",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "usernamehw.errorlens",
+        "Gruntfuggly.todo-tree",
+        "VisualStudioExptTeam.vscodeintellicode",
+        "rust-lang.rust-analyzer",
+        "tamasfe.even-better-toml",
+        "fill-labs.dependi"
+      ]
+    }
+  }
+}
