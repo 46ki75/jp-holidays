@@ -8,4 +8,13 @@ pub enum Error {
 
     #[error("An error occurred during CSV parsing: {0}")]
     Csv(#[from] csv::Error),
+
+    #[error("Invalid date: {0}")]
+    InvalidDate(String),
+
+    #[error("An error occurred during JSON serialization: {0}")]
+    Json(#[from] serde_json::Error),
+
+    #[error("An error occurred during file I/O: {0}")]
+    Io(#[from] std::io::Error),
 }
