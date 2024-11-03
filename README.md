@@ -1,6 +1,6 @@
 # 日本の祝日 HTTP STATIC API
 
-[![Build and Deploy (v1)](https://github.com/46ki75/jp-holidays/actions/workflows/build-deploy-v1.yml/badge.svg)](https://github.com/46ki75/jp-holidays/actions/workflows/build-deploy-v1.yml) [![Unit Test](https://github.com/46ki75/jp-holidays/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/46ki75/jp-holidays/actions/workflows/unit-tests.yml) ![現在公表されている最後の祝日](https://shields.io/badge/dynamic/json?url=https://46ki75.github.io/jp-holidays/api/v1/list.json&query=$.results[-1:].date&label=現在公表されている最後の祝日)
+[![Build and Deploy (v1)](https://github.com/46ki75/jp-holidays/actions/workflows/build-deploy-v1.yml/badge.svg)](https://github.com/46ki75/jp-holidays/actions/workflows/build-deploy-v1.yml) [![Unit Test](https://github.com/46ki75/jp-holidays/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/46ki75/jp-holidays/actions/workflows/unit-tests.yml) [![Build Test](https://github.com/46ki75/jp-holidays/actions/workflows/build-tests.yml/badge.svg)](https://github.com/46ki75/jp-holidays/actions/workflows/unit-tests.yml) ![現在公表されている最後の祝日](https://shields.io/badge/dynamic/json?url=https://46ki75.github.io/jp-holidays/api/v1/list.json&query=$.results[-1:].date&label=現在公表されている最後の祝日)
 
 この API は、日本の祝日情報を静的にビルドした JSON 形式で提供する HTTP ベースの API です。
 
