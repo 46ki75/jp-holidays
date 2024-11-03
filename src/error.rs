@@ -8,4 +8,7 @@ pub enum Error {
 
     #[error("An error occurred during CSV parsing: {0}")]
     Csv(#[from] csv::Error),
+
+    #[error("Invalid date: {0}")]
+    InvalidDate(String),
 }
