@@ -19,11 +19,11 @@ impl From<Vec<crate::holiday::Holiday>> for ResponseList {
 impl ResponseList {
     /// path must end with a slash
     /// e.g. "./dist/api/v1/"
-    pub fn save(&self, path: &str) -> Result<(), crate::error::Error> {
+    pub fn save(&self, path: &str, name: &str) -> Result<(), crate::error::Error> {
         let file = std::fs::OpenOptions::new()
             .create(true)
             .append(true)
-            .open(format!("{}list.json", path))?;
+            .open(format!("{}{}.json", path, name))?;
         serde_json::to_writer(file, self)?;
         Ok(())
     }
