@@ -109,7 +109,7 @@ mod tests {
     fn test_response_from_holiday() {
         let holiday = crate::holiday::Holiday {
             name: "祝日".to_string(),
-            date: NaiveDate::from_ymd_opt(2025, 11, 23).expect("Invalid date"), // 例: 日曜日
+            date: NaiveDate::from_ymd_opt(2025, 11, 23).expect("Invalid date"),
         };
 
         let response: Response = holiday.into();
