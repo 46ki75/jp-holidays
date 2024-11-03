@@ -28,6 +28,8 @@ impl From<crate::holiday::Holiday> for Response {
 
 impl From<chrono::NaiveDate> for Response {
     fn from(date: chrono::NaiveDate) -> Self {
+        let holiday = matches!(date.weekday(), chrono::Weekday::Sat | chrono::Weekday::Sun);
+
         Self {
             name: None,
             date: date.to_string(),
@@ -35,7 +37,18 @@ impl From<chrono::NaiveDate> for Response {
             month: date.month(),
             day: date.day(),
             public: false,
-            holiday: false,
+            holiday,
         }
+    }
+}
+
+impl Response {
+    pub fn save(&self) -> Result<(), crate::error::Error> {
+        let file = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(format!("./dist/{}.json", self.date))?;
+        serde_json::to_writer(file, self)?;
+        Ok(())
     }
 }
