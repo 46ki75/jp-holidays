@@ -72,3 +72,56 @@ impl Response {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::NaiveDate;
+
+    #[test]
+    fn test_to_japanese_weekday() {
+        assert_eq!(Response::to_japanese_weekday(chrono::Weekday::Mon), "月");
+        assert_eq!(Response::to_japanese_weekday(chrono::Weekday::Tue), "火");
+        assert_eq!(Response::to_japanese_weekday(chrono::Weekday::Wed), "水");
+        assert_eq!(Response::to_japanese_weekday(chrono::Weekday::Thu), "木");
+        assert_eq!(Response::to_japanese_weekday(chrono::Weekday::Fri), "金");
+        assert_eq!(Response::to_japanese_weekday(chrono::Weekday::Sat), "土");
+        assert_eq!(Response::to_japanese_weekday(chrono::Weekday::Sun), "日");
+    }
+
+    #[test]
+    fn test_response_from_naive_date() {
+        let date = NaiveDate::from_ymd_opt(2025, 11, 11).expect("Invalid date");
+        let response: Response = date.into();
+
+        assert_eq!(response.name, None);
+        assert_eq!(response.date, "2025-11-11");
+        assert_eq!(response.year, 2025);
+        assert_eq!(response.month, 11);
+        assert_eq!(response.day, 11);
+        assert_eq!(response.day_of_week, "Tuesday");
+        assert_eq!(response.day_of_week_ja, "火");
+        assert!(!response.public);
+        assert!(!response.holiday);
+    }
+
+    #[test]
+    fn test_response_from_holiday() {
+        let holiday = crate::holiday::Holiday {
+            name: "祝日".to_string(),
+            date: NaiveDate::from_ymd_opt(2025, 11, 23).expect("Invalid date"), // 例: 日曜日
+        };
+
+        let response: Response = holiday.into();
+
+        assert_eq!(response.name, Some("祝日".to_string()));
+        assert_eq!(response.date, "2025-11-23");
+        assert_eq!(response.year, 2025);
+        assert_eq!(response.month, 11);
+        assert_eq!(response.day, 23);
+        assert_eq!(response.day_of_week, "Sunday");
+        assert_eq!(response.day_of_week_ja, "日");
+        assert!(response.public);
+        assert!(response.holiday);
+    }
+}
