@@ -4,6 +4,9 @@ mod holiday;
 mod response;
 mod util;
 
+use chrono::NaiveDate;
+use std::collections::HashSet;
+
 #[tokio::main]
 async fn main() -> Result<(), error::Error> {
     let raw_csv_bytes =
@@ -21,16 +24,19 @@ async fn main() -> Result<(), error::Error> {
         error::Error::InvalidDate("Failed to get the last date.".to_string()),
     )?;
 
-    let responses: Vec<response::Response> = holidays.into_iter().map(Into::into).collect();
+    // let mut responses: Vec<response::Response>;
 
-    for response in responses {
-        println!("{:?}", response);
-    }
+    let holiday_dates: HashSet<NaiveDate> = holidays.iter().map(|holiday| holiday.date).collect();
 
     let mut current_date = first_date;
 
     while current_date <= last_date {
-        println!("{:?}", current_date);
+        if holiday_dates.contains(&current_date) {
+            println!("Holiday: {:?}", current_date);
+        } else {
+            println!("Not a holiday: {:?}", current_date);
+        }
+
         current_date = current_date
             .checked_add_signed(chrono::Duration::days(1))
             .ok_or(error::Error::InvalidDate(
