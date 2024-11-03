@@ -43,11 +43,13 @@ impl From<chrono::NaiveDate> for Response {
 }
 
 impl Response {
-    pub fn save(&self) -> Result<(), crate::error::Error> {
+    /// path must end with a slash
+    /// e.g. "./dist/api/v1/"
+    pub fn save(&self, path: &str) -> Result<(), crate::error::Error> {
         let file = std::fs::OpenOptions::new()
             .create(true)
             .append(true)
-            .open(format!("./dist/{}.json", self.date))?;
+            .open(format!("{}{}.json", path, self.date))?;
         serde_json::to_writer(file, self)?;
         Ok(())
     }

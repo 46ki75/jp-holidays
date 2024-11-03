@@ -9,6 +9,8 @@ use std::collections::HashSet;
 
 #[tokio::main]
 async fn main() -> Result<(), error::Error> {
+    const ROOT_DIR: &str = "./dist/api/v1/";
+
     let raw_csv_bytes =
         util::fetch_csv("https://www8.cao.go.jp/chosei/shukujitsu/syukujitsu.csv").await?;
 
@@ -24,8 +26,13 @@ async fn main() -> Result<(), error::Error> {
         error::Error::InvalidDate("Failed to get the last date.".to_string()),
     )?;
 
-    std::fs::remove_dir_all("./dist")?;
-    std::fs::create_dir("./dist")?;
+    let is_dir_exists = std::path::Path::new(ROOT_DIR).exists();
+
+    if is_dir_exists {
+        std::fs::remove_dir_all(ROOT_DIR)?;
+    }
+
+    std::fs::create_dir_all(ROOT_DIR)?;
 
     let holiday_dates: HashSet<NaiveDate> = holidays.iter().map(|holiday| holiday.date).collect();
 
@@ -33,7 +40,6 @@ async fn main() -> Result<(), error::Error> {
 
     while current_date <= last_date {
         if holiday_dates.contains(&current_date) {
-            println!("Holiday: {:?}", current_date);
             response::Response::from(
                 holidays
                     .iter()
@@ -43,10 +49,9 @@ async fn main() -> Result<(), error::Error> {
                     ))?
                     .clone(),
             )
-            .save()?;
+            .save(ROOT_DIR)?;
         } else {
-            println!("Not a holiday: {:?}", current_date);
-            response::Response::from(current_date).save()?;
+            response::Response::from(current_date).save(ROOT_DIR)?;
         }
 
         current_date = current_date
