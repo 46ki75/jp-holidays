@@ -11,4 +11,7 @@ pub enum Error {
 
     #[error("Invalid date: {0}")]
     InvalidDate(String),
+
+    #[error("An error occurred during JSON serialization: {0}")]
+    Json(#[from] serde_json::Error),
 }

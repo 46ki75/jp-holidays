@@ -24,7 +24,7 @@ async fn main() -> Result<(), error::Error> {
         error::Error::InvalidDate("Failed to get the last date.".to_string()),
     )?;
 
-    // let mut responses: Vec<response::Response>;
+    let mut responses: Vec<response::Response> = vec![];
 
     let holiday_dates: HashSet<NaiveDate> = holidays.iter().map(|holiday| holiday.date).collect();
 
@@ -33,8 +33,18 @@ async fn main() -> Result<(), error::Error> {
     while current_date <= last_date {
         if holiday_dates.contains(&current_date) {
             println!("Holiday: {:?}", current_date);
+            responses.push(response::Response::from(
+                holidays
+                    .iter()
+                    .find(|holiday| holiday.date == current_date)
+                    .ok_or(error::Error::InvalidDate(
+                        "Failed to find a holiday.".to_string(),
+                    ))?
+                    .clone(),
+            ));
         } else {
             println!("Not a holiday: {:?}", current_date);
+            responses.push(response::Response::from(current_date));
         }
 
         current_date = current_date
@@ -45,6 +55,8 @@ async fn main() -> Result<(), error::Error> {
     }
 
     println!("{} ~ {}", first_date, last_date);
+
+    println!("{}", serde_json::to_string(&responses)?);
 
     Ok(())
 }
