@@ -17,14 +17,21 @@
         "DavidAnson.vscode-markdownlint",
         "yzhang.markdown-all-in-one",
         "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "stylelint.vscode-stylelint",
+        "rust-lang.rust-analyzer",
+        "tamasfe.even-better-toml",
+        "fill-labs.dependi"
       ]
     }
   },
   "forwardPorts": [],
   "features": {
     "ghcr.io/devcontainers-extra/features/starship": {},
-    "ghcr.io/devcontainers/features/github-cli": {}
+    "ghcr.io/devcontainers/features/github-cli": {},
+    "ghcr.io/devcontainers/features/aws-cli": {},
+    "ghcr.io/devcontainers/features/node": {},
+    "ghcr.io/devcontainers/features/rust": {}
   },
   "postCreateCommand": "echo 'eval \"$(starship init bash)\"' >> ~/.bashrc"
 }
