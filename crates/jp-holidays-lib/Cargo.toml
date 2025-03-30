@@ -1,7 +1,16 @@
 [package]
 name = "jp-holidays-lib"
-version = "0.1.0"
+description = "Japanese holiday library for working with public holiday data in Rust."
+version = "1.0.0"
 edition = "2024"
+authors = ["Chomolungma Shirayuki"]
+repository = "https://github.com/46ki75/jp-holidays"
+license = "MIT"
+documentation = "https://docs.rs/jp-holidays-lib"
+categories = ["date-and-time", "internationalization", "data-structures"]
+keywords = ["japan", "holiday", "calendar", "datetime", "localization"]
+readme = "README.md"
+
 
 [dependencies]
 async-trait = "0.1.88"
