@@ -34,3 +34,24 @@ async fn test_invalid_date() {
     let result = client.get_holiday(1955, 2, 30);
     assert!(result.is_err());
 }
+
+#[tokio::test]
+async fn test_is_day_off_holiday() {
+    let client = Client::init().await.unwrap();
+    let is_day_off = client.is_day_off(1955, 1, 1).unwrap();
+    assert!(is_day_off);
+}
+
+#[tokio::test]
+async fn test_is_day_off_weekend() {
+    let client = Client::init().await.unwrap();
+    let is_day_off = client.is_day_off(1955, 1, 8).unwrap();
+    assert!(is_day_off);
+}
+
+#[tokio::test]
+async fn test_is_day_off_weekday_non_holiday() {
+    let client = Client::init().await.unwrap();
+    let is_day_off = client.is_day_off(1955, 1, 5).unwrap();
+    assert!(!is_day_off);
+}
