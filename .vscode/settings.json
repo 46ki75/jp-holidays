@@ -1,3 +1,6 @@
 {
-  "stylelint.validate": ["css", "postcss", "scss", "vue"]
+  "stylelint.validate": ["css", "postcss", "scss", "vue"],
+  "files.associations": {
+    "LICENSE": "plaintext"
+  }
 }
