@@ -7,7 +7,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // 休日かどうか確認
     let is_day_off = client.is_holiday_ymd(1956, 3, 21)?;
     println!(
-        "1956 3月 22日 は{}",
+        "1956 3月 21日 は{}",
         if is_day_off {
             "休日です"
         } else {
