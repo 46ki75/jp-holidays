@@ -1,4 +1,4 @@
-name: Unit Test (crates/jp-holidays-lib)
+name: Test Example Executables (crates/jp-holidays-lib)
 
 on:
   push:
@@ -21,6 +21,6 @@ jobs:
       - name: Setup Rust Toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
 
-      - name: Run Unit Test
-        run: cargo test --lib
+      - name: Test Example Executables
+        run: ./execute-examples.sh
         working-directory: crates/jp-holidays-lib/

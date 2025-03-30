@@ -23,3 +23,4 @@ jobs:
 
       - name: Run Integration Test
         run: cargo test
+        working-directory: crates/jp-holidays-lib/
