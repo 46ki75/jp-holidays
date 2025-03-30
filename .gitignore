@@ -1,0 +1,10 @@
+# Local env files
+.env
+.env.*
+!.env.example
+
+# Rust
+target/
+
+# Node.js
+.pnpm-store/
