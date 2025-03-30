@@ -9,7 +9,8 @@ impl Client {
         let holiday_repository = std::sync::Arc::new(crate::repository::HolidayRepositoryImpl);
         let holiday_service =
             std::sync::Arc::new(crate::service::HolidayService { holiday_repository });
-        let csv = holiday_service.get_utf8_csv_string().await?;
+        let shiftjis_bytes = holiday_service.fetch_shiftjis_csv_bytes().await?;
+        let csv = holiday_service.parse_csv(shiftjis_bytes).await?;
         let data = holiday_service.deserialize_csv(&csv)?;
         Ok(Self { data })
     }
@@ -19,7 +20,8 @@ impl Client {
         let holiday_repository = std::sync::Arc::new(crate::repository::HolidayRepositoryStub);
         let holiday_service =
             std::sync::Arc::new(crate::service::HolidayService { holiday_repository });
-        let csv = holiday_service.get_utf8_csv_string().await?;
+        let shiftjis_bytes = holiday_service.fetch_shiftjis_csv_bytes().await?;
+        let csv = holiday_service.parse_csv(shiftjis_bytes).await?;
         let data = holiday_service.deserialize_csv(&csv)?;
         Ok(Self { data })
     }

@@ -4,10 +4,17 @@ pub(crate) struct HolidayService {
 }
 
 impl HolidayService {
-    pub(crate) async fn get_utf8_csv_string(&self) -> Result<String, crate::error::Error> {
-        let sjis_csv_bytes = self.holiday_repository.fetch_csv().await?;
+    pub(crate) async fn fetch_shiftjis_csv_bytes(
+        &self,
+    ) -> Result<bytes::Bytes, crate::error::Error> {
+        self.holiday_repository.fetch_csv().await
+    }
 
-        let (cow, _, _) = encoding_rs::SHIFT_JIS.decode(&sjis_csv_bytes[..]);
+    pub(crate) async fn parse_csv(
+        &self,
+        shiftjis_bytes: bytes::Bytes,
+    ) -> Result<String, crate::error::Error> {
+        let (cow, _, _) = encoding_rs::SHIFT_JIS.decode(&shiftjis_bytes[..]);
 
         let result = cow.into_owned();
 
@@ -85,7 +92,9 @@ mod tests {
 
         let holiday_service = HolidayService { holiday_repository };
 
-        let csv = holiday_service.get_utf8_csv_string().await?;
+        let shiftjis_bytes = holiday_service.fetch_shiftjis_csv_bytes().await?;
+
+        let csv = holiday_service.parse_csv(shiftjis_bytes).await?;
 
         let _ = holiday_service.deserialize_csv(&csv)?;
 
