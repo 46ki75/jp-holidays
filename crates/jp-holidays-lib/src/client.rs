@@ -26,6 +26,11 @@ impl Client {
         Ok(Self { data })
     }
 
+    /// 現在内閣府から公開されている範囲の祝日一覧を取得します。
+    pub fn list_holidays(&self) -> &std::collections::BTreeMap<NaiveDate, String> {
+        &self.data
+    }
+
     pub fn get_holiday(&self, date: NaiveDate) -> Option<&str> {
         self.data.get(&date).map(|s| s.as_str())
     }

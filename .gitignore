@@ -5,6 +5,7 @@
 
 # Rust
 target/
+__tmp.rs
 
 # Node.js
 .pnpm-store/
