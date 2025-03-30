@@ -8,7 +8,7 @@ pub trait HolidayRepository: Send + Sync {
     async fn fetch_csv(&self) -> Result<bytes::Bytes, crate::error::Error>;
 }
 
-/// Implementation of the `HolidayRepository` for prouction use.
+/// Implementation of the `HolidayRepository` for production use.
 pub struct HolidayRepositoryImpl;
 
 #[async_trait::async_trait]
