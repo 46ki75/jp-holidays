@@ -3,5 +3,6 @@
   "stylelint.validate": ["css", "postcss", "scss", "vue"],
   "files.associations": {
     "LICENSE": "plaintext"
-  }
+  },
+  "rust-analyzer.cargo.features": ["time"]
 }

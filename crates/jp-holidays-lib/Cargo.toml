@@ -30,3 +30,33 @@ thiserror = "2.0.12"
 
 [dev-dependencies]
 tokio = { version = "1.44.2", features = ["full"] }
+
+[[example]]
+name = "basic"
+path = "examples/basic.rs"
+required-features = ["time"]
+
+[[example]]
+name = "cache"
+path = "examples/cache.rs"
+required-features = ["time"]
+
+[[example]]
+name = "get_holiday"
+path = "examples/get_holiday.rs"
+required-features = ["time"]
+
+[[example]]
+name = "is_day_off"
+path = "examples/is_day_off.rs"
+required-features = ["time"]
+
+[[example]]
+name = "is_holiday"
+path = "examples/is_holiday.rs"
+required-features = ["time"]
+
+[[example]]
+name = "list_holidays"
+path = "examples/list_holidays.rs"
+required-features = ["time"]
