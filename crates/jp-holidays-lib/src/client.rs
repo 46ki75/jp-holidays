@@ -26,13 +26,17 @@ impl Client {
     ///
     /// ## 使用例
     ///
+    /// ```
     #[doc = include_str!("../examples/basic.rs")]
+    /// ```
     ///
     /// ## キャッシュの利用
     ///
     /// 非同期ランタイムに `tokio` を使用している場合、以下のようにキャッシュを活用できます。
     /// 
+    /// ```
     #[doc = include_str!("../examples/cache.rs")]
+    /// ```    
     pub async fn init() -> Result<Self, crate::error::Error> {
         let holiday_repository = std::sync::Arc::new(crate::repository::HolidayRepositoryImpl);
         let holiday_service =
