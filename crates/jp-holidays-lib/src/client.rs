@@ -1,3 +1,5 @@
+//! クレートのエントリーポイントである `Client` を定義しています。
+
 use chrono::{Datelike, NaiveDate};
 
 /// `jp_holidays_lib::client::Client::init()` にて初期化を行います。

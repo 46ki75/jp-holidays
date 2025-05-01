@@ -1,3 +1,5 @@
+#![deny(missing_docs)]
+
 pub(crate) struct HolidayService {
     pub(crate) holiday_repository:
         std::sync::Arc<dyn crate::repository::HolidayRepository + Send + Sync>,

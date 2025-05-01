@@ -1,3 +1,5 @@
+#![deny(missing_docs)]
+
 //! # jp-holidays-lib
 //!
 //! 内閣府の公開する [「国民の祝日」について](https://www8.cao.go.jp/chosei/shukujitsu/gaiyou.html) より
