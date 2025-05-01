@@ -11,11 +11,8 @@ use chrono::{Datelike, NaiveDate};
 /// ### メソッド
 ///
 /// - `get_holiday()`: `chrono::NaiveDate` を渡して祝日を取得します。
-/// - `get_holiday_ymd()`: 年月日を渡して祝日を取得します。
 /// - `is_holiday()`:  `chrono::NaiveDate` を渡して祝日かどうかを判定します。
-/// - `is_holiday_ymd()`:  年月日を渡して祝日かどうかを判定します。
 /// - `is_day_off()`: `chrono::NaiveDate` を渡して休日かどうかを判定します。
-/// - `is_day_off_ymd.()`: 年月日を渡して休日かどうかを判定します。
 /// - `list_holidays()`: 公開されている祝日をすべて取得します (`BTreeMap<NaiveDate, String>`)
 pub struct Client {
     data: std::collections::BTreeMap<NaiveDate, String>,
@@ -33,7 +30,7 @@ impl Client {
     /// ## キャッシュの利用
     ///
     /// 非同期ランタイムに `tokio` を使用している場合、以下のようにキャッシュを活用できます。
-    /// 
+    ///
     /// ```
     #[doc = include_str!("../examples/cache.rs")]
     /// ```    
@@ -80,25 +77,6 @@ impl Client {
         self.data.get(&date).map(|s| s.as_str())
     }
 
-    ///　年月日を渡して祝日を取得します。
-    ///
-    /// ## 使用例
-    /// ```
-    #[doc = include_str!("../examples/get_holiday_ymd.rs")]
-    /// ```
-    pub fn get_holiday_ymd(
-        &self,
-        year: i32,
-        month: u32,
-        day: u32,
-    ) -> Result<Option<&str>, crate::error::Error> {
-        let date =
-            NaiveDate::from_ymd_opt(year, month, day).ok_or(crate::error::Error::InvalidDate(
-                format!("不正な日付です: {}年 {}月 {}日", year, month, day),
-            ))?;
-        Ok(self.get_holiday(date))
-    }
-
     ///　`chrono::NaiveDate` を渡して祝日かどうか確認します。
     ///
     /// ## 使用例
@@ -108,26 +86,6 @@ impl Client {
     /// ```
     pub fn is_holiday(&self, date: NaiveDate) -> bool {
         self.data.contains_key(&date)
-    }
-
-    ///　年月日を渡して祝日かどうか確認します。
-    ///
-    /// ## 使用例
-    ///
-    /// ```
-    #[doc = include_str!("../examples/is_holiday_ymd.rs")]
-    /// ```
-    pub fn is_holiday_ymd(
-        &self,
-        year: i32,
-        month: u32,
-        day: u32,
-    ) -> Result<bool, crate::error::Error> {
-        let date =
-            NaiveDate::from_ymd_opt(year, month, day).ok_or(crate::error::Error::InvalidDate(
-                format!("不正な日付です: {}年 {}月 {}日", year, month, day),
-            ))?;
-        Ok(self.is_holiday(date))
     }
 
     ///　`chrono::NaiveDate` を渡して**休日**(祝日+土日)かどうか確認します。
@@ -141,85 +99,66 @@ impl Client {
         matches!(date.weekday(), chrono::Weekday::Sat | chrono::Weekday::Sun)
             || self.is_holiday(date)
     }
-
-    ///　年月日を渡して**休日**(祝日+土日)かどうか確認します。
-    ///
-    /// ## 使用例
-    ///
-    /// ```
-    #[doc = include_str!("../examples/is_day_off_ymd.rs")]
-    /// ```
-    pub fn is_day_off_ymd(
-        &self,
-        year: i32,
-        month: u32,
-        day: u32,
-    ) -> Result<bool, crate::error::Error> {
-        let date =
-            NaiveDate::from_ymd_opt(year, month, day).ok_or(crate::error::Error::InvalidDate(
-                format!("不正な日付です: {}年 {}月 {}日", year, month, day),
-            ))?;
-        Ok(self.is_day_off(date))
-    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use chrono::NaiveDate;
 
     #[tokio::test]
     async fn test_get_holiday_known_date() {
         let client = Client::init_stub().await.unwrap();
-        let holiday = client.get_holiday_ymd(1955, 1, 1).unwrap();
-        assert_eq!(holiday, Some("元日"));
+        let date = NaiveDate::from_ymd_opt(1955, 1, 1).unwrap();
+        let holiday = client.get_holiday(date).unwrap();
+        assert_eq!(holiday, "元日");
     }
 
     #[tokio::test]
     async fn test_get_holiday_unknown_date() {
         let client = Client::init_stub().await.unwrap();
-        let holiday = client.get_holiday_ymd(1955, 1, 2).unwrap();
+        let date = NaiveDate::from_ymd_opt(1955, 1, 2).unwrap();
+        let holiday = client.get_holiday(date);
         assert_eq!(holiday, None);
     }
 
     #[tokio::test]
     async fn test_is_holiday_true() {
         let client = Client::init_stub().await.unwrap();
-        let is_holiday = client.is_holiday_ymd(1955, 5, 5).unwrap();
+        let date = NaiveDate::from_ymd_opt(1955, 5, 5).unwrap();
+        let is_holiday = client.is_holiday(date);
         assert!(is_holiday);
     }
 
     #[tokio::test]
     async fn test_is_holiday_false() {
         let client = Client::init_stub().await.unwrap();
-        let is_holiday = client.is_holiday_ymd(1955, 5, 4).unwrap();
+        let date = NaiveDate::from_ymd_opt(1955, 5, 4).unwrap();
+        let is_holiday = client.is_holiday(date);
         assert!(!is_holiday);
-    }
-
-    #[tokio::test]
-    async fn test_invalid_date() {
-        let client = Client::init_stub().await.unwrap();
-        let result = client.get_holiday_ymd(1955, 2, 30);
-        assert!(result.is_err());
     }
 
     #[tokio::test]
     async fn test_is_day_off_holiday() {
         let client = Client::init_stub().await.unwrap();
-        let is_day_off = client.is_day_off_ymd(1955, 1, 1).unwrap();
+        let date = NaiveDate::from_ymd_opt(1955, 1, 1).unwrap();
+        let is_day_off = client.is_day_off(date);
         assert!(is_day_off);
     }
 
     #[tokio::test]
     async fn test_is_day_off_weekend() {
         let client = Client::init_stub().await.unwrap();
-        let is_day_off = client.is_day_off_ymd(1955, 1, 8).unwrap();
+        let date = NaiveDate::from_ymd_opt(1955, 1, 8).unwrap();
+        let is_day_off = client.is_day_off(date);
         assert!(is_day_off);
     }
 
     #[tokio::test]
     async fn test_is_day_off_weekday_non_holiday() {
         let client = Client::init_stub().await.unwrap();
-        let is_day_off = client.is_day_off_ymd(1955, 1, 5).unwrap();
+        let date = NaiveDate::from_ymd_opt(1955, 1, 5).unwrap();
+        let is_day_off = client.is_day_off(date);
         assert!(!is_day_off);
     }
 }
