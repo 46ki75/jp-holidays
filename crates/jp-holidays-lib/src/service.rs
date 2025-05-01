@@ -26,7 +26,7 @@ impl HolidayService {
     pub(crate) fn deserialize_csv(
         &self,
         csv: &str,
-    ) -> Result<std::collections::BTreeMap<chrono::NaiveDate, String>, crate::error::Error> {
+    ) -> Result<std::collections::BTreeMap<crate::Date, String>, crate::error::Error> {
         csv.lines()
             .skip(1)
             .filter(|line| !line.trim().is_empty())
@@ -39,8 +39,16 @@ impl HolidayService {
                     .next()
                     .ok_or_else(|| crate::error::Error::Parse("no name".into()))?;
 
-                let date = chrono::NaiveDate::parse_from_str(date_str.trim(), "%Y/%m/%d")
-                    .map_err(|e| crate::error::Error::Parse(e.to_string()))?;
+                cfg_if::cfg_if! {
+                    if #[cfg(feature = "chrono")]{
+                    let date = chrono::NaiveDate::parse_from_str(date_str.trim(), "%Y/%m/%d")
+                        .map_err(|e| crate::error::Error::Parse(e.to_string()))?;
+                    } else if #[cfg(feature = "time")] {
+                        let format = time::macros::format_description!("[year]/[month]/[day]");
+                        let date = time::Date::parse(date_str.trim(), &format)
+                        .map_err(|e| crate::error::Error::Parse(e.to_string()))?;
+                    }
+                }
 
                 Ok((date, name_str.trim().to_string()))
             })
@@ -66,22 +74,40 @@ mod tests {
 
         let results = holiday_service.deserialize_csv(csv)?;
 
-        const FMT: &str = "%Y/%m/%d";
-
-        let expected = std::collections::BTreeMap::from([
-            (
-                chrono::NaiveDate::parse_from_str("1955/1/1", FMT).unwrap(),
-                "元日".to_string(),
-            ),
-            (
-                chrono::NaiveDate::parse_from_str("1955/1/15", FMT).unwrap(),
-                "成人の日".to_string(),
-            ),
-            (
-                chrono::NaiveDate::parse_from_str("1955/3/21", FMT).unwrap(),
-                "春分の日".to_string(),
-            ),
-        ]);
+        cfg_if::cfg_if! {
+            if #[cfg(feature = "chrono")]{
+                const FMT: &str = "%Y/%m/%d";
+                let expected = std::collections::BTreeMap::from([
+                    (
+                        chrono::NaiveDate::parse_from_str("1955/1/1", FMT).unwrap(),
+                        "元日".to_string(),
+                    ),
+                    (
+                        chrono::NaiveDate::parse_from_str("1955/1/15", FMT).unwrap(),
+                        "成人の日".to_string(),
+                    ),
+                    (
+                        chrono::NaiveDate::parse_from_str("1955/3/21", FMT).unwrap(),
+                        "春分の日".to_string(),
+                    ),
+                ]);
+            } else if #[cfg(feature = "time")]{
+                let expected = std::collections::BTreeMap::from([
+                    (
+                        time::Date::from_calendar_date(1999, time::Month::January, 1).unwrap(),
+                        "元日".to_string(),
+                    ),
+                    (
+                        time::Date::from_calendar_date(1999, time::Month::January, 15).unwrap(),
+                        "成人の日".to_string(),
+                    ),
+                    (
+                        time::Date::from_calendar_date(1999, time::Month::March, 21).unwrap(),
+                        "春分の日".to_string(),
+                    ),
+                ]);
+            }
+        }
 
         assert_eq!(results, expected);
 
