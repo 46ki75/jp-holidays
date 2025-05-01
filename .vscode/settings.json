@@ -1,4 +1,5 @@
 {
+  "editor.formatOnSave": true,
   "stylelint.validate": ["css", "postcss", "scss", "vue"],
   "files.associations": {
     "LICENSE": "plaintext"
