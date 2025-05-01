@@ -9,7 +9,7 @@ on:
 
 jobs:
   test:
-    name: cargo test
+    name: Examples Test
     runs-on: ubuntu-latest
 
     steps:
