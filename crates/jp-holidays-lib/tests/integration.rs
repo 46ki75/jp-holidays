@@ -6,9 +6,9 @@ async fn test_get_holiday_known_date() {
     let date = {
         cfg_if::cfg_if! {
             if #[cfg(feature = "chrono")] {
-                jp_holidays_lib::Date::from_ymd_opt(1955, 1, 1).unwrap()
-            } else {
-                jp_holidays_lib::Date::from_calendar_date(1955, time::Month::January, 1).unwrap()
+                chrono::NativeDate::from_ymd_opt(1955, 1, 1).unwrap()
+            } else if #[cfg(feature = "time")] {
+                time::Date::from_calendar_date(1955, time::Month::January, 1).unwrap()
             }
         }
     };
@@ -22,9 +22,9 @@ async fn test_get_holiday_unknown_date() {
     let date = {
         cfg_if::cfg_if! {
             if #[cfg(feature = "chrono")] {
-                jp_holidays_lib::Date::from_ymd_opt(1955, 1, 2).unwrap()
-            } else {
-                jp_holidays_lib::Date::from_calendar_date(1955, time::Month::January, 2).unwrap()
+                chrono::NativeDate::from_ymd_opt(1955, 1, 2).unwrap()
+            } else if #[cfg(feature = "time")] {
+                time::Date::from_calendar_date(1955, time::Month::January, 2).unwrap()
             }
         }
     };
@@ -38,9 +38,9 @@ async fn test_is_holiday_true() {
     let date = {
         cfg_if::cfg_if! {
             if #[cfg(feature = "chrono")] {
-                jp_holidays_lib::Date::from_ymd_opt(1955, 5, 5).unwrap()
-            } else {
-                jp_holidays_lib::Date::from_calendar_date(1955, time::Month::May, 5).unwrap()
+                chrono::NativeDate::from_ymd_opt(1955, 5, 5).unwrap()
+            } else if #[cfg(feature = "time")] {
+                time::Date::from_calendar_date(1955, time::Month::May, 5).unwrap()
             }
         }
     };
@@ -54,9 +54,9 @@ async fn test_is_holiday_false() {
     let date = {
         cfg_if::cfg_if! {
             if #[cfg(feature = "chrono")] {
-                jp_holidays_lib::Date::from_ymd_opt(1955, 5, 4).unwrap()
-            } else {
-                jp_holidays_lib::Date::from_calendar_date(1955, time::Month::May, 4).unwrap()
+                chrono::NativeDate::from_ymd_opt(1955, 5, 4).unwrap()
+            } else if #[cfg(feature = "time")] {
+                time::Date::from_calendar_date(1955, time::Month::May, 4).unwrap()
             }
         }
     };
@@ -70,9 +70,9 @@ async fn test_is_day_off_holiday() {
     let date = {
         cfg_if::cfg_if! {
             if #[cfg(feature = "chrono")] {
-                jp_holidays_lib::Date::from_ymd_opt(1955, 1, 1).unwrap()
-            } else {
-                jp_holidays_lib::Date::from_calendar_date(1955, time::Month::January, 1).unwrap()
+                chrono::NativeDate::from_ymd_opt(1955, 1, 1).unwrap()
+            } else if #[cfg(feature = "time")] {
+                time::Date::from_calendar_date(1955, time::Month::January, 1).unwrap()
             }
         }
     };
@@ -86,9 +86,9 @@ async fn test_is_day_off_weekend() {
     let date = {
         cfg_if::cfg_if! {
             if #[cfg(feature = "chrono")] {
-                jp_holidays_lib::Date::from_ymd_opt(1955, 1, 8).unwrap()
-            } else {
-                jp_holidays_lib::Date::from_calendar_date(1955, time::Month::January, 8).unwrap()
+                chrono::NativeDate::from_ymd_opt(1955, 1, 8).unwrap()
+            } else if #[cfg(feature = "time")] {
+                time::Date::from_calendar_date(1955, time::Month::January, 8).unwrap()
             }
         }
     };
@@ -102,9 +102,9 @@ async fn test_is_day_off_weekday_non_holiday() {
     let date = {
         cfg_if::cfg_if! {
             if #[cfg(feature = "chrono")] {
-                jp_holidays_lib::Date::from_ymd_opt(1955, 1, 5).unwrap()
-            } else {
-                jp_holidays_lib::Date::from_calendar_date(1955, time::Month::January, 5).unwrap()
+                chrono::NativeDate::from_ymd_opt(1955, 1, 5).unwrap()
+            } else if #[cfg(feature = "time")] {
+                time::Date::from_calendar_date(1955, time::Month::January, 5).unwrap()
             }
         }
     };

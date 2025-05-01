@@ -44,7 +44,7 @@ impl HolidayService {
                     let date = chrono::NaiveDate::parse_from_str(date_str.trim(), "%Y/%m/%d")
                         .map_err(|e| crate::error::Error::Parse(e.to_string()))?;
                     } else if #[cfg(feature = "time")] {
-                        let format = time::macros::format_description!("[year]/[month]/[day]");
+                        let format = time::macros::format_description!("[year]/[month padding:none]/[day padding:none]");
                         let date = time::Date::parse(date_str.trim(), &format)
                         .map_err(|e| crate::error::Error::Parse(e.to_string()))?;
                     }
@@ -94,15 +94,15 @@ mod tests {
             } else if #[cfg(feature = "time")]{
                 let expected = std::collections::BTreeMap::from([
                     (
-                        time::Date::from_calendar_date(1999, time::Month::January, 1).unwrap(),
+                        time::Date::from_calendar_date(1955, time::Month::January, 1).unwrap(),
                         "元日".to_string(),
                     ),
                     (
-                        time::Date::from_calendar_date(1999, time::Month::January, 15).unwrap(),
+                        time::Date::from_calendar_date(1955, time::Month::January, 15).unwrap(),
                         "成人の日".to_string(),
                     ),
                     (
-                        time::Date::from_calendar_date(1999, time::Month::March, 21).unwrap(),
+                        time::Date::from_calendar_date(1955, time::Month::March, 21).unwrap(),
                         "春分の日".to_string(),
                     ),
                 ]);

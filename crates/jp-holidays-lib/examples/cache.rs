@@ -1,4 +1,3 @@
-use chrono::NaiveDate;
 use jp_holidays_lib::{client::Client, error::Error};
 
 // Client::init() は非同期に内閣府から祝日情報を取得するため、
@@ -16,7 +15,9 @@ async fn execute() -> Result<(), Box<dyn std::error::Error>> {
     let client = get_client().await?;
 
     // 祝日を取得
-    let date = NaiveDate::from_ymd_opt(1955, 11, 23).ok_or("存在しない日付です".to_string())?;
+    let date = time::Date::from_calendar_date(1955, time::Month::November, 23)
+        .ok()
+        .ok_or("存在しない日付です".to_string())?;
 
     let maybe_holiday = client.get_holiday(date);
 
@@ -26,7 +27,9 @@ async fn execute() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     // 祝日かどうか確認
-    let date = NaiveDate::from_ymd_opt(1956, 3, 21).ok_or("存在しない日付です".to_string())?;
+    let date = time::Date::from_calendar_date(1956, time::Month::March, 21)
+        .ok()
+        .ok_or("存在しない日付です".to_string())?;
 
     let is_holiday = client.is_holiday(date);
 

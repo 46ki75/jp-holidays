@@ -12,7 +12,7 @@ keywords = ["japan", "holiday", "calendar", "datetime", "localization"]
 readme = "README.md"
 
 [features]
-default = ["chrono"]
+default = ["time"]
 time = ["dep:time"]
 chrono = ["dep:chrono"]
 
