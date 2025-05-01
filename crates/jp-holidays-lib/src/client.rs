@@ -27,102 +27,16 @@ impl Client {
     /// ## 使用例
     ///
     /// ```
-    /// use chrono::NaiveDate;
-    /// use jp_holidays_lib::client::Client;
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let client = Client::init().await?;
-    ///
-    ///     // 祝日を取得
-    ///     let date = NaiveDate::from_ymd_opt(1955, 11, 23).ok_or("存在しない日付です".to_string())?;
-    ///
-    ///     let maybe_holiday = client.get_holiday(date);
-    ///
-    ///     match maybe_holiday {
-    ///         Some(holiday) => println!("1955年 11月 23日 は{}", holiday),
-    ///         None => println!("1955年 11月 23日 は祝日ではありません"),
-    ///     };
-    ///
-    ///     // 祝日かどうか確認
-    ///     let date = NaiveDate::from_ymd_opt(1956, 3, 21).ok_or("存在しない日付です".to_string())?;
-    ///
-    ///     let is_holiday = client.is_holiday(date);
-    ///
-    ///     println!(
-    ///         "1956 3月 21日 は{}",
-    ///         if is_holiday {
-    ///             "祝日です"
-    ///         } else {
-    ///             "祝日ではありません"
-    ///         }
-    ///     );
-    ///
-    ///     Ok(())
-    /// }
+    #[doc = include_str!("../examples/basic.rs")]
     /// ```
     ///
     /// ## キャッシュの利用
     ///
     /// 非同期ランタイムに `tokio` を使用している場合、以下のようにキャッシュを活用できます。
-    ///
+    /// 
     /// ```
-    /// use chrono::NaiveDate;
-    /// use jp_holidays_lib::{client::Client, error::Error};
-    ///
-    /// // Client::init() は非同期に内閣府から祝日情報を取得するため、
-    /// // tokio::sync::OnceCell を使って初回のみ初期化し、その後はキャッシュを使用します。
-    /// static CACHE: tokio::sync::OnceCell<Client> = tokio::sync::OnceCell::const_new();
-    ///
-    /// // キャッシュされた Client インスタンスを取得します
-    /// async fn get_client() -> Result<&'static Client, Error> {
-    ///     CACHE.get_or_try_init(Client::init).await
-    /// }
-    ///
-    /// // 実行用の関数（main から呼び出し）
-    /// // スコープを抜けても Client はキャッシュされ続けます
-    /// async fn execute() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let client = get_client().await?;
-    ///
-    ///     // 祝日を取得
-    ///     let date = NaiveDate::from_ymd_opt(1955, 11, 23).ok_or("存在しない日付です".to_string())?;
-    ///
-    ///     let maybe_holiday = client.get_holiday(date);
-    ///
-    ///     match maybe_holiday {
-    ///         Some(holiday) => println!("1955年 11月 23日 は{}", holiday),
-    ///         None => println!("1955年 11月 23日 は祝日ではありません"),
-    ///     };
-    ///
-    ///     // 祝日かどうか確認
-    ///     let date = NaiveDate::from_ymd_opt(1956, 3, 21).ok_or("存在しない日付です".to_string())?;
-    ///
-    ///     let is_holiday = client.is_holiday(date);
-    ///
-    ///     println!(
-    ///         "1956 3月 21日 は{}",
-    ///         if is_holiday {
-    ///             "祝日です"
-    ///         } else {
-    ///             "祝日ではありません"
-    ///         }
-    ///     );
-    ///
-    ///     Ok(())
-    /// }
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     for i in 0..5 {
-    ///         let start = std::time::Instant::now();
-    ///         execute().await?;
-    ///         let duration = start.elapsed();
-    ///         println!("{}回目の実行時間: {:?}\n", i + 1, duration);
-    ///     }
-    ///
-    ///     Ok(())
-    /// }
-    /// ```
+    #[doc = include_str!("../examples/cache.rs")]
+    /// ```    
     pub async fn init() -> Result<Self, crate::error::Error> {
         let holiday_repository = std::sync::Arc::new(crate::repository::HolidayRepositoryImpl);
         let holiday_service =
@@ -134,7 +48,6 @@ impl Client {
     }
 
     #[cfg(test)]
-    #[doc = include_str!("../../../README.md")]
     async fn init_stub() -> Result<Self, crate::error::Error> {
         let holiday_repository = std::sync::Arc::new(crate::repository::HolidayRepositoryStub);
         let holiday_service =
@@ -150,29 +63,7 @@ impl Client {
     /// ## 使用例
     ///
     /// ```
-    /// use chrono::NaiveDate;
-    /// use jp_holidays_lib::client::Client;
-    /// use std::ops::Bound::{Excluded, Included};
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let client = Client::init().await?;
-    ///
-    ///     // 2018年 の祝日のみを取得します。
-    ///     let start = NaiveDate::from_ymd_opt(2018, 1, 1).ok_or("存在しない日付です".to_string())?;
-    ///     let end = NaiveDate::from_ymd_opt(2019, 1, 1).ok_or("存在しない日付です".to_string())?;
-    ///
-    ///     // 公開されている祝日をすべて取得します。その後範囲を絞ります。
-    ///     let holidays_2018 = client
-    ///         .list_holidays()
-    ///         .range((Included(start), Excluded(end)));
-    ///
-    ///     for (date, name) in holidays_2018 {
-    ///         println!("{} | {}", date, name);
-    ///     }
-    ///
-    ///     Ok(())
-    /// }
+    #[doc = include_str!("../examples/list_holidays.rs")]
     /// ```
     pub fn list_holidays(&self) -> &std::collections::BTreeMap<NaiveDate, String> {
         &self.data
@@ -183,25 +74,7 @@ impl Client {
     /// ## 使用例
     ///
     /// ```
-    /// use chrono::NaiveDate;
-    /// use jp_holidays_lib::client::Client;
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let client = Client::init().await?;
-    ///
-    ///     // 祝日を取得
-    ///     let date = NaiveDate::from_ymd_opt(1955, 11, 23).ok_or("存在しない日付です".to_string())?;
-    ///
-    ///     let maybe_holiday = client.get_holiday(date);
-    ///
-    ///     match maybe_holiday {
-    ///         Some(holiday) => println!("1955年 11月 23日 は{}", holiday),
-    ///         None => println!("1955年 11月 23日 は祝日ではありません"),
-    ///     };
-    ///
-    ///     Ok(())
-    /// }
+    #[doc = include_str!("../examples/get_holiday.rs")]
     /// ```
     pub fn get_holiday(&self, date: NaiveDate) -> Option<&str> {
         self.data.get(&date).map(|s| s.as_str())
@@ -211,26 +84,7 @@ impl Client {
     ///
     /// ## 使用例
     /// ```
-    /// use jp_holidays_lib::client::Client;
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let client = Client::init().await?;
-    ///
-    ///     // 祝日かどうか確認
-    ///     let is_holiday = client.is_holiday_ymd(1956, 3, 21)?;
-    ///     println!(
-    ///         "1956 3月 21日 は{}",
-    ///         if is_holiday {
-    ///             "祝日です"
-    ///         } else {
-    ///             "祝日ではありません"
-    ///         }
-    ///     );
-    ///
-    ///     Ok(())
-    /// }
-    ///
+    #[doc = include_str!("../examples/get_holiday_ymd.rs")]
     /// ```
     pub fn get_holiday_ymd(
         &self,
@@ -250,30 +104,7 @@ impl Client {
     /// ## 使用例
     ///
     /// ```
-    /// use chrono::NaiveDate;
-    /// use jp_holidays_lib::client::Client;
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let client = Client::init().await?;
-    ///
-    ///     // 祝日かどうか確認
-    ///     let date = NaiveDate::from_ymd_opt(1956, 3, 21).ok_or("存在しない日付です".to_string())?;
-    ///
-    ///     let is_holiday = client.is_holiday(date);
-    ///
-    ///     println!(
-    ///         "1956 3月 21日 は{}",
-    ///         if is_holiday {
-    ///             "祝日です"
-    ///         } else {
-    ///             "祝日ではありません"
-    ///         }
-    ///     );
-    ///
-    ///     Ok(())
-    /// }
-    ///
+    #[doc = include_str!("../examples/is_holiday.rs")]
     /// ```
     pub fn is_holiday(&self, date: NaiveDate) -> bool {
         self.data.contains_key(&date)
@@ -284,26 +115,7 @@ impl Client {
     /// ## 使用例
     ///
     /// ```
-    /// use jp_holidays_lib::client::Client;
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let client = Client::init().await?;
-    ///
-    ///     // 祝日かどうか確認
-    ///     let is_holiday = client.is_holiday_ymd(1956, 3, 21)?;
-    ///     println!(
-    ///         "1956 3月 21日 は{}",
-    ///         if is_holiday {
-    ///             "祝日です"
-    ///         } else {
-    ///             "祝日ではありません"
-    ///         }
-    ///     );
-    ///
-    ///     Ok(())
-    /// }
-    ///
+    #[doc = include_str!("../examples/is_holiday_ymd.rs")]
     /// ```
     pub fn is_holiday_ymd(
         &self,
@@ -323,29 +135,7 @@ impl Client {
     /// ## 使用例
     ///
     /// ```
-    /// use chrono::NaiveDate;
-    /// use jp_holidays_lib::client::Client;
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let client = Client::init().await?;
-    ///
-    ///     // 休日かどうか確認
-    ///     let date = NaiveDate::from_ymd_opt(1956, 3, 21).ok_or("存在しない日付です".to_string())?;
-    ///
-    ///     let is_day_off = client.is_day_off(date);
-    ///
-    ///     println!(
-    ///         "1956 3月 21日 は{}",
-    ///         if is_day_off {
-    ///             "休日です"
-    ///         } else {
-    ///             "休日ではありません"
-    ///         }
-    ///     );
-    ///
-    ///     Ok(())
-    /// }
+    #[doc = include_str!("../examples/is_day_off.rs")]
     /// ```
     pub fn is_day_off(&self, date: NaiveDate) -> bool {
         matches!(date.weekday(), chrono::Weekday::Sat | chrono::Weekday::Sun)
@@ -357,25 +147,7 @@ impl Client {
     /// ## 使用例
     ///
     /// ```
-    /// use jp_holidays_lib::client::Client;
-    ///
-    /// #[tokio::main]
-    /// async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    ///     let client = Client::init().await?;
-    ///
-    ///     // 休日かどうか確認
-    ///     let is_day_off = client.is_holiday_ymd(1956, 3, 21)?;
-    ///     println!(
-    ///         "1956 3月 22日 は{}",
-    ///         if is_day_off {
-    ///             "休日です"
-    ///         } else {
-    ///             "休日ではありません"
-    ///         }
-    ///     );
-    ///
-    ///     Ok(())
-    /// }
+    #[doc = include_str!("../examples/is_day_off_ymd.rs")]
     /// ```
     pub fn is_day_off_ymd(
         &self,
