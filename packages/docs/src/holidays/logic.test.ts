@@ -81,7 +81,9 @@ describe("nextHoliday", () => {
   });
 
   it("looks across year boundaries", () => {
-    expect(nextHoliday(HOLIDAYS, fromKey("2023-12-31"))?.key).toBe("2024-01-01");
+    expect(nextHoliday(HOLIDAYS, fromKey("2023-12-31"))?.key).toBe(
+      "2024-01-01",
+    );
   });
 
   it("returns null when nothing follows", () => {

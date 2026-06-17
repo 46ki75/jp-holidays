@@ -37,7 +37,9 @@ describe("YearPanel", () => {
   it("dims dates that have already passed in the current year", () => {
     const { container } = setup();
     // Both 2026 holidays (Jan, May) precede today (June).
-    expect(container.querySelectorAll('.holiday-row[data-past="true"]')).toHaveLength(2);
+    expect(
+      container.querySelectorAll('.holiday-row[data-past="true"]'),
+    ).toHaveLength(2);
   });
 
   it("steps forward and backward through the available years", () => {

@@ -79,9 +79,14 @@ export function upcomingHolidays(
 }
 
 /** Every holiday in a given calendar year, chronologically. */
-export function holidaysInYear(holidays: Holidays, year: number): HolidayEntry[] {
+export function holidaysInYear(
+  holidays: Holidays,
+  year: number,
+): HolidayEntry[] {
   const prefix = `${year}-`;
-  return sortedEntries(holidays).filter((entry) => entry.key.startsWith(prefix));
+  return sortedEntries(holidays).filter((entry) =>
+    entry.key.startsWith(prefix),
+  );
 }
 
 export interface HolidayStats {
