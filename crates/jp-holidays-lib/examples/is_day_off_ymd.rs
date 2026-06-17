@@ -1,8 +1,7 @@
-use jp_holidays_lib::client::Client;
+use jp_holidays_lib::Client;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::init().await?;
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
 
     // 休日かどうか確認
     let is_day_off = client.is_day_off_ymd(1956, 3, 21)?;

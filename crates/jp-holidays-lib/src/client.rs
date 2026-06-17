@@ -1,77 +1,86 @@
-//! クレートのエントリーポイントである `Client` を定義しています。
+//! The crate entry point: [`Client`].
 
 use chrono::{Datelike, NaiveDate};
+use std::collections::BTreeMap;
 
-/// `jp_holidays_lib::client::Client::init()` にて初期化を行います。
+/// Holiday data for Japan, queried through a set of convenience methods.
 ///
-/// ### 関連関数
+/// A `Client` is constructed in one of three ways:
 ///
-/// - `init()`: クライアントを初期化します。
-///
-/// ### メソッド
-///
-/// - `get_holiday()`: `chrono::NaiveDate` を渡して祝日を取得します。
-/// - `get_holiday_ymd()`: 年月日を渡して祝日を取得します。
-/// - `is_holiday()`:  `chrono::NaiveDate` を渡して祝日かどうかを判定します。
-/// - `is_holiday_ymd()`:  年月日を渡して祝日かどうかを判定します。
-/// - `is_day_off()`: `chrono::NaiveDate` を渡して休日かどうかを判定します。
-/// - `is_day_off_ymd.()`: 年月日を渡して休日かどうかを判定します。
-/// - `list_holidays()`: 公開されている祝日をすべて取得します (`BTreeMap<NaiveDate, String>`)
+/// - [`Client::new`] — synchronous, backed by the holiday data bundled into the
+///   crate at build time. No network access and no async runtime required.
+/// - [`Client::from_csv`] — parse a UTF-8 CSV string in the Cabinet Office
+///   format that you supply yourself.
+/// - [`Client::fetch`] — *(feature `fetch`)* download the latest data from the
+///   Cabinet Office of Japan at runtime.
 pub struct Client {
-    data: std::collections::BTreeMap<NaiveDate, String>,
+    data: BTreeMap<NaiveDate, String>,
 }
 
 impl Client {
-    /// クライアントを初期化します。
+    /// Creates a client from the holiday data bundled into the crate at build
+    /// time.
     ///
-    /// ## 使用例
+    /// This is synchronous and requires neither network access nor an async
+    /// runtime. The bundled data is refreshed periodically and shipped with new
+    /// releases; for guaranteed up-to-date data use [`Client::fetch`].
+    ///
+    /// ## Example
     ///
     /// ```
     #[doc = include_str!("../examples/basic.rs")]
     /// ```
-    ///
-    /// ## キャッシュの利用
-    ///
-    /// 非同期ランタイムに `tokio` を使用している場合、以下のようにキャッシュを活用できます。
-    /// 
-    /// ```
-    #[doc = include_str!("../examples/cache.rs")]
-    /// ```    
-    pub async fn init() -> Result<Self, crate::error::Error> {
-        let holiday_repository = std::sync::Arc::new(crate::repository::HolidayRepositoryImpl);
-        let holiday_service =
-            std::sync::Arc::new(crate::service::HolidayService { holiday_repository });
-        let shiftjis_bytes = holiday_service.fetch_shiftjis_csv_bytes().await?;
-        let csv = holiday_service.parse_csv(shiftjis_bytes).await?;
-        let data = holiday_service.deserialize_csv(&csv)?;
-        Ok(Self { data })
+    pub fn new() -> Self {
+        // The bundled CSV is validated by a unit test, so parsing cannot fail.
+        let data = crate::parse::parse_csv(Self::BUNDLED_CSV)
+            .expect("bundled holiday CSV should always parse");
+        Self { data }
     }
 
-    #[cfg(test)]
-    async fn init_stub() -> Result<Self, crate::error::Error> {
-        let holiday_repository = std::sync::Arc::new(crate::repository::HolidayRepositoryStub);
-        let holiday_service =
-            std::sync::Arc::new(crate::service::HolidayService { holiday_repository });
-        let shiftjis_bytes = holiday_service.fetch_shiftjis_csv_bytes().await?;
-        let csv = holiday_service.parse_csv(shiftjis_bytes).await?;
-        let data = holiday_service.deserialize_csv(&csv)?;
-        Ok(Self { data })
+    /// The UTF-8 holiday CSV bundled into the crate at build time.
+    const BUNDLED_CSV: &'static str = include_str!("data/syukujitsu.csv");
+
+    /// Creates a client by parsing a UTF-8 CSV string in the Cabinet Office
+    /// format (`YYYY/M/D,name` rows with a header line).
+    ///
+    /// ## Errors
+    ///
+    /// Returns an error if the CSV is structurally malformed or contains an
+    /// unparseable date.
+    pub fn from_csv(csv: &str) -> Result<Self, crate::error::Error> {
+        Ok(Self {
+            data: crate::parse::parse_csv(csv)?,
+        })
     }
 
-    /// 現在内閣府から公開されている範囲の祝日一覧を取得します。
+    /// Creates a client by downloading the latest holiday data from the Cabinet
+    /// Office of Japan.
     ///
-    /// ## 使用例
+    /// Requires the `fetch` feature.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an error if the request fails or the response cannot be parsed.
+    #[cfg(feature = "fetch")]
+    pub async fn fetch() -> Result<Self, crate::error::Error> {
+        let csv = crate::fetch::fetch_csv().await?;
+        Self::from_csv(&csv)
+    }
+
+    /// Returns every published holiday as a map sorted by date.
+    ///
+    /// ## Example
     ///
     /// ```
     #[doc = include_str!("../examples/list_holidays.rs")]
     /// ```
-    pub fn list_holidays(&self) -> &std::collections::BTreeMap<NaiveDate, String> {
+    pub fn list_holidays(&self) -> &BTreeMap<NaiveDate, String> {
         &self.data
     }
 
-    ///　`chrono::NaiveDate` を渡して祝日を取得します。
+    /// Returns the holiday name for `date`, or `None` if it is not a holiday.
     ///
-    /// ## 使用例
+    /// ## Example
     ///
     /// ```
     #[doc = include_str!("../examples/get_holiday.rs")]
@@ -80,9 +89,15 @@ impl Client {
         self.data.get(&date).map(|s| s.as_str())
     }
 
-    ///　年月日を渡して祝日を取得します。
+    /// Returns the holiday name for the given year/month/day.
     ///
-    /// ## 使用例
+    /// ## Errors
+    ///
+    /// Returns [`Error::InvalidDate`](crate::error::Error::InvalidDate) if the
+    /// arguments do not form a valid calendar date.
+    ///
+    /// ## Example
+    ///
     /// ```
     #[doc = include_str!("../examples/get_holiday_ymd.rs")]
     /// ```
@@ -92,16 +107,12 @@ impl Client {
         month: u32,
         day: u32,
     ) -> Result<Option<&str>, crate::error::Error> {
-        let date =
-            NaiveDate::from_ymd_opt(year, month, day).ok_or(crate::error::Error::InvalidDate(
-                format!("不正な日付です: {}年 {}月 {}日", year, month, day),
-            ))?;
-        Ok(self.get_holiday(date))
+        Ok(self.get_holiday(to_date(year, month, day)?))
     }
 
-    ///　`chrono::NaiveDate` を渡して祝日かどうか確認します。
+    /// Returns whether `date` is a holiday.
     ///
-    /// ## 使用例
+    /// ## Example
     ///
     /// ```
     #[doc = include_str!("../examples/is_holiday.rs")]
@@ -110,9 +121,14 @@ impl Client {
         self.data.contains_key(&date)
     }
 
-    ///　年月日を渡して祝日かどうか確認します。
+    /// Returns whether the given year/month/day is a holiday.
     ///
-    /// ## 使用例
+    /// ## Errors
+    ///
+    /// Returns [`Error::InvalidDate`](crate::error::Error::InvalidDate) if the
+    /// arguments do not form a valid calendar date.
+    ///
+    /// ## Example
     ///
     /// ```
     #[doc = include_str!("../examples/is_holiday_ymd.rs")]
@@ -123,16 +139,12 @@ impl Client {
         month: u32,
         day: u32,
     ) -> Result<bool, crate::error::Error> {
-        let date =
-            NaiveDate::from_ymd_opt(year, month, day).ok_or(crate::error::Error::InvalidDate(
-                format!("不正な日付です: {}年 {}月 {}日", year, month, day),
-            ))?;
-        Ok(self.is_holiday(date))
+        Ok(self.is_holiday(to_date(year, month, day)?))
     }
 
-    ///　`chrono::NaiveDate` を渡して**休日**(祝日+土日)かどうか確認します。
+    /// Returns whether `date` is a day off — a holiday or a weekend (Sat/Sun).
     ///
-    /// ## 使用例
+    /// ## Example
     ///
     /// ```
     #[doc = include_str!("../examples/is_day_off.rs")]
@@ -142,9 +154,15 @@ impl Client {
             || self.is_holiday(date)
     }
 
-    ///　年月日を渡して**休日**(祝日+土日)かどうか確認します。
+    /// Returns whether the given year/month/day is a day off — a holiday or a
+    /// weekend (Sat/Sun).
     ///
-    /// ## 使用例
+    /// ## Errors
+    ///
+    /// Returns [`Error::InvalidDate`](crate::error::Error::InvalidDate) if the
+    /// arguments do not form a valid calendar date.
+    ///
+    /// ## Example
     ///
     /// ```
     #[doc = include_str!("../examples/is_day_off_ymd.rs")]
@@ -155,71 +173,73 @@ impl Client {
         month: u32,
         day: u32,
     ) -> Result<bool, crate::error::Error> {
-        let date =
-            NaiveDate::from_ymd_opt(year, month, day).ok_or(crate::error::Error::InvalidDate(
-                format!("不正な日付です: {}年 {}月 {}日", year, month, day),
-            ))?;
-        Ok(self.is_day_off(date))
+        Ok(self.is_day_off(to_date(year, month, day)?))
     }
+}
+
+impl Default for Client {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Builds a [`NaiveDate`] from components, mapping an invalid date to
+/// [`Error::InvalidDate`](crate::error::Error::InvalidDate).
+fn to_date(year: i32, month: u32, day: u32) -> Result<NaiveDate, crate::error::Error> {
+    NaiveDate::from_ymd_opt(year, month, day).ok_or(crate::error::Error::InvalidDate {
+        year,
+        month,
+        day,
+    })
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[tokio::test]
-    async fn test_get_holiday_known_date() {
-        let client = Client::init_stub().await.unwrap();
-        let holiday = client.get_holiday_ymd(1955, 1, 1).unwrap();
-        assert_eq!(holiday, Some("元日"));
+    #[test]
+    fn bundled_csv_parses() {
+        // Guards the `expect` in `Client::new`.
+        let client = Client::new();
+        assert!(!client.list_holidays().is_empty());
     }
 
-    #[tokio::test]
-    async fn test_get_holiday_unknown_date() {
-        let client = Client::init_stub().await.unwrap();
-        let holiday = client.get_holiday_ymd(1955, 1, 2).unwrap();
-        assert_eq!(holiday, None);
+    #[test]
+    fn get_holiday_known_date() {
+        let client = Client::new();
+        assert_eq!(client.get_holiday_ymd(1955, 1, 1).unwrap(), Some("元日"));
     }
 
-    #[tokio::test]
-    async fn test_is_holiday_true() {
-        let client = Client::init_stub().await.unwrap();
-        let is_holiday = client.is_holiday_ymd(1955, 5, 5).unwrap();
-        assert!(is_holiday);
+    #[test]
+    fn get_holiday_unknown_date() {
+        let client = Client::new();
+        assert_eq!(client.get_holiday_ymd(1955, 1, 2).unwrap(), None);
     }
 
-    #[tokio::test]
-    async fn test_is_holiday_false() {
-        let client = Client::init_stub().await.unwrap();
-        let is_holiday = client.is_holiday_ymd(1955, 5, 4).unwrap();
-        assert!(!is_holiday);
+    #[test]
+    fn is_holiday_true_and_false() {
+        let client = Client::new();
+        assert!(client.is_holiday_ymd(1955, 5, 5).unwrap());
+        assert!(!client.is_holiday_ymd(1955, 5, 4).unwrap());
     }
 
-    #[tokio::test]
-    async fn test_invalid_date() {
-        let client = Client::init_stub().await.unwrap();
-        let result = client.get_holiday_ymd(1955, 2, 30);
-        assert!(result.is_err());
+    #[test]
+    fn invalid_date_errors() {
+        let client = Client::new();
+        assert!(client.get_holiday_ymd(1955, 2, 30).is_err());
     }
 
-    #[tokio::test]
-    async fn test_is_day_off_holiday() {
-        let client = Client::init_stub().await.unwrap();
-        let is_day_off = client.is_day_off_ymd(1955, 1, 1).unwrap();
-        assert!(is_day_off);
+    #[test]
+    fn is_day_off_holiday_weekend_and_weekday() {
+        let client = Client::new();
+        assert!(client.is_day_off_ymd(1955, 1, 1).unwrap()); // holiday
+        assert!(client.is_day_off_ymd(1955, 1, 8).unwrap()); // Saturday
+        assert!(!client.is_day_off_ymd(1955, 1, 5).unwrap()); // ordinary weekday
     }
 
-    #[tokio::test]
-    async fn test_is_day_off_weekend() {
-        let client = Client::init_stub().await.unwrap();
-        let is_day_off = client.is_day_off_ymd(1955, 1, 8).unwrap();
-        assert!(is_day_off);
-    }
-
-    #[tokio::test]
-    async fn test_is_day_off_weekday_non_holiday() {
-        let client = Client::init_stub().await.unwrap();
-        let is_day_off = client.is_day_off_ymd(1955, 1, 5).unwrap();
-        assert!(!is_day_off);
+    #[test]
+    fn from_csv_roundtrip() {
+        let client = Client::from_csv("h,h\n2020/1/1,元日\n").unwrap();
+        assert_eq!(client.get_holiday_ymd(2020, 1, 1).unwrap(), Some("元日"));
     }
 }
