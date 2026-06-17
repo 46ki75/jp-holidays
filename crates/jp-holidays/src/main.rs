@@ -5,11 +5,16 @@
 //!
 //! ```text
 //! .nojekyll
-//! index.html
 //! api/v1/holidays.json   # { "1955-01-01": "元日", ... }  all holidays
 //! api/v1/{year}.json     # same shape, one year
 //! api/v1/years.json      # { "years": [...], "count": N, "source": "...", "generated_at": "<ISO>" }
+//! api/v1/openapi.json    # OpenAPI 3.1 spec
+//! api/v1/docs.html       # Scalar API reference
 //! ```
+//!
+//! The site's `index.html` landing page is the React app in `packages/docs`
+//! (built separately and merged into the same output directory at deploy time),
+//! so it is intentionally not emitted here.
 
 use std::collections::BTreeMap;
 use std::path::PathBuf;
@@ -26,9 +31,6 @@ const SOURCE_URL: &str = "https://www8.cao.go.jp/chosei/shukujitsu/syukujitsu.cs
 
 /// Public base URL of the deployed API (GitHub Pages).
 const BASE_URL: &str = "https://46ki75.github.io/jp-holidays";
-
-/// Landing page documenting the static API.
-const INDEX_HTML: &str = include_str!("index.html");
 
 /// Scalar API reference page (loads `openapi.json`).
 const DOCS_HTML: &str = include_str!("docs.html");
@@ -186,8 +188,9 @@ fn render(client: &Client, generated_at: String) -> Vec<(PathBuf, String)> {
     ));
     files.push((PathBuf::from("api/v1/docs.html"), DOCS_HTML.to_string()));
 
+    // GitHub Pages: skip Jekyll processing. `index.html` is provided by the
+    // React docs app in `packages/docs`, merged in at deploy time.
     files.push((PathBuf::from(".nojekyll"), String::new()));
-    files.push((PathBuf::from("index.html"), INDEX_HTML.to_string()));
 
     files
 }
@@ -220,7 +223,8 @@ mod tests {
         assert!(files.contains_key(&PathBuf::from("api/v1/openapi.json")));
         assert!(files.contains_key(&PathBuf::from("api/v1/docs.html")));
         assert!(files.contains_key(&PathBuf::from(".nojekyll")));
-        assert!(files.contains_key(&PathBuf::from("index.html")));
+        // `index.html` is owned by the React docs app, not the generator.
+        assert!(!files.contains_key(&PathBuf::from("index.html")));
     }
 
     #[test]

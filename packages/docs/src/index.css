@@ -1,0 +1,54 @@
+:root {
+  --font-body: "Zen Kaku Gothic New", system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  --font-display: "Zen Old Mincho", "Hiragino Mincho ProN", "YuMincho", serif;
+  --font-mono: "DM Mono", ui-monospace, "Source Code Pro", Menlo, monospace;
+
+  /* The one subject accent: holidays. Drawn from the elmethis palette so it
+     stays cohesive with the brand rather than injecting a saturated red. */
+  --accent-holiday: var(--elmethis-color-display-red);
+  --rule: color-mix(in srgb, var(--elmethis-color-neutral) 26%, transparent);
+
+  color-scheme: light dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.8;
+  background-color: var(--elmethis-color-surface-base);
+  color: var(--elmethis-color-neutral-strong);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* Proportional kana/Latin spacing for cleaner Japanese typography. */
+  font-feature-settings: "palt";
+}
+
+/* Display face (Mincho) for the page's major headings and showpiece text. */
+.em-doc h1,
+.em-doc h2,
+.em-doc .display {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+/* Tabular/monospace for code, dates, endpoint paths and numerals. */
+.mono {
+  font-family: var(--font-mono);
+  font-feature-settings: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

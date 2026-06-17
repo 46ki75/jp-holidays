@@ -13,3 +13,6 @@ lcov.info
 
 # Node.js
 .pnpm-store/
+
+# Playwright MCP scratch output
+.playwright-mcp/

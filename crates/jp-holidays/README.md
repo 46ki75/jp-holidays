@@ -19,12 +19,14 @@ cargo run -p jp-holidays -- --out-dir dist
 ```text
 dist/
   .nojekyll
-  index.html
   api/v1/holidays.json   # { "1955-01-01": "元日", ... }  全期間
   api/v1/{year}.json     # 指定した年（同じ形式）
   api/v1/years.json      # 年の一覧 + メタデータ
   api/v1/openapi.json    # OpenAPI 3.1 仕様（utoipa で生成）
   api/v1/docs.html       # Scalar による API リファレンス
 ```
+
+トップページ（`index.html`）はこのクレートではなく [`packages/docs`](../../packages/docs/)
+の React アプリが生成します。デプロイ時に両者を同じディレクトリへマージします。
 
 詳細はワークスペースの [README](../../README.md) を参照してください。

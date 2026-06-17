@@ -34,8 +34,17 @@ coverage-html: test-cov
 coverage-ci: test-cov
     cargo llvm-cov report --lcov --output-path lcov.info
 
-# Generate the static JSON API site into ./dist.
-build-site out_dir="dist":
+# Generate only the static JSON API (+ OpenAPI + Scalar page) into a directory.
+build-api out_dir="dist":
     cargo run -p jp-holidays -- --out-dir {{out_dir}}
+
+# Build the React docs landing page (packages/docs/dist).
+build-docs:
+    pnpm -C packages/docs install --frozen-lockfile
+    pnpm -C packages/docs build
+
+# Build the full deployable site: React docs + JSON API merged into packages/docs/dist.
+build-site: build-docs
+    cargo run -p jp-holidays -- --out-dir packages/docs/dist
 
 ci: fmt-check lint test
