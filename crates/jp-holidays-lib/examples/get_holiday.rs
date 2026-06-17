@@ -1,9 +1,8 @@
 use chrono::NaiveDate;
-use jp_holidays_lib::client::Client;
+use jp_holidays_lib::Client;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::init().await?;
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = Client::new();
 
     // 祝日を取得
     let date = NaiveDate::from_ymd_opt(1955, 11, 23).ok_or("存在しない日付です".to_string())?;

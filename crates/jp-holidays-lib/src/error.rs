@@ -1,21 +1,33 @@
-//! Defines crate-wide error types for use throughout the application.
+//! Defines crate-wide error types.
 
 /// Error type for this crate.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    /// Occurs when sending HTTP requests fails.
-    #[error("HTTP リクエスト中にエラーが発生: {0}")]
-    Http(String),
+    /// The HTTP request to fetch holiday data failed.
+    ///
+    /// Only produced by [`Client::fetch`](crate::Client::fetch), available
+    /// under the `fetch` feature.
+    #[cfg(feature = "fetch")]
+    #[error("failed to fetch holiday data over HTTP: {0}")]
+    Http(#[from] reqwest::Error),
 
-    /// Occurs when reading response body fails.
-    #[error("レスポンスボディの読み取りに失敗: {0}")]
-    BodyRead(String),
+    /// The CSV was structurally malformed (e.g. a row was missing the date or
+    /// name column).
+    #[error("malformed holiday CSV: {0}")]
+    MalformedCsv(String),
 
-    /// Occurs when parsing CSV fails.
-    #[error("CSV のパースに失敗: {0}")]
-    Parse(String),
+    /// A date in the CSV could not be parsed.
+    #[error("failed to parse date in holiday CSV: {0}")]
+    ParseDate(#[from] chrono::ParseError),
 
-    /// Occurs when date format is invalid.
-    #[error("不正な日付: {0}")]
-    InvalidDate(String),
+    /// The supplied year/month/day do not form a valid calendar date.
+    #[error("invalid date: {year}-{month}-{day}")]
+    InvalidDate {
+        /// Year component.
+        year: i32,
+        /// Month component.
+        month: u32,
+        /// Day component.
+        day: u32,
+    },
 }

@@ -1,0 +1,31 @@
+name: Live Tests
+
+# Exercises the network `fetch` path against the Cabinet Office endpoint — both
+# the library and the static-API generator. Runs on a schedule and on demand
+# only — it must NOT gate PR merges, since it can fail for reasons unrelated to
+# the diff (upstream outage, network).
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  live:
+    name: Live Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Live Tests (library)
+        run: cargo test -p jp-holidays-lib --features fetch -- --ignored
+
+      - name: Live Tests (generator)
+        run: cargo test -p jp-holidays -- --ignored

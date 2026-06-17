@@ -1,0 +1,78 @@
+name: Docs CI
+
+# Format, lint, test, and build the React docs landing page (packages/docs).
+# Each check runs as an independent matrix job so failures are reported
+# separately. Install/runtime setup mirrors the Pages deploy workflow.
+
+on:
+  push:
+    paths:
+      - "packages/docs/**"
+      - ".github/workflows/docs-ci.yaml"
+  pull_request:
+    paths:
+      - "packages/docs/**"
+      - ".github/workflows/docs-ci.yaml"
+  workflow_dispatch:
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: docs-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/docs
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Format
+            command: pnpm run fmt.check
+          - name: Lint
+            command: pnpm run lint
+          - name: Lint CSS
+            command: pnpm run lint.css
+          - name: Test
+            command: pnpm run test.coverage
+          - name: Build Check
+            command: pnpm run build
+
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: packages/docs/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: ${{ matrix.name }}
+        run: ${{ matrix.command }}
+
+      - name: Upload coverage to Codecov
+        if: matrix.name == 'Test'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          working-directory: packages/docs
+          files: coverage/lcov.info
+          flags: docs
+          disable_search: true
+          fail_ci_if_error: false

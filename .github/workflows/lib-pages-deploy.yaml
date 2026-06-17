@@ -1,0 +1,83 @@
+name: Deploy Site (GitHub Pages)
+
+# Builds the React docs landing page (packages/docs) and the static JSON API
+# (jp-holidays generator), merges them into one directory, and publishes it to
+# GitHub Pages. The generator fetches the latest data from the Cabinet Office at
+# run time, so the daily schedule keeps the published site current.
+#
+# Prerequisite: repo Settings -> Pages -> Source = "GitHub Actions".
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; don't cancel an in-progress run.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: packages/docs/pnpm-lock.yaml
+
+      - name: Install docs dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: packages/docs
+
+      - name: Build docs landing page
+        run: pnpm run build
+        working-directory: packages/docs
+
+      - name: Setup Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      # Emit the JSON API + OpenAPI spec + Scalar page into the built docs dir,
+      # alongside the React app's index.html and assets.
+      - name: Generate static API into docs output
+        run: cargo run -p jp-holidays -- --out-dir packages/docs/dist
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: packages/docs/dist
+
+  deploy:
+    name: Deploy to Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
