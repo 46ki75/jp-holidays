@@ -2,7 +2,7 @@
   --font-body:
     "Zen Kaku Gothic New", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-display: "Zen Old Mincho", "Hiragino Mincho ProN", "YuMincho", serif;
-  --font-mono: "DM Mono", ui-monospace, "Source Code Pro", Menlo, monospace;
+  --font-mono: "DM Mono", ui-monospace, "Source Code Pro", menlo, monospace;
 
   /* The one subject accent: holidays. Drawn from the elmethis palette so it
      stays cohesive with the brand rather than injecting a saturated red. */
@@ -25,7 +25,8 @@ body {
   color: var(--elmethis-color-neutral-strong);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+  text-rendering: optimizelegibility;
+
   /* Proportional kana/Latin spacing for cleaner Japanese typography. */
   font-feature-settings: "palt";
 }
