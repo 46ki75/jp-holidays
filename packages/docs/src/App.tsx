@@ -17,6 +17,7 @@ import {
   ElmTableHeader,
   ElmTableRow,
   ElmToggleTheme,
+  ElmLanguageIcon,
 } from "@elmethis/react";
 import {
   mdiAlertOutline,
@@ -140,7 +141,8 @@ function TodayPanel({
           <ElmMdiIcon d={mdiAlertOutline} size="0.95rem" />
           <span>
             お使いの地域では今日は {time.drift.localLabel}、日本では{" "}
-            {time.drift.tokyoLabel} です。祝日は日本標準時（JST）で判定しています。
+            {time.drift.tokyoLabel}{" "}
+            です。祝日は日本標準時（JST）で判定しています。
           </span>
         </p>
       )}
@@ -184,8 +186,8 @@ function App() {
             静的 JSON で配信。
           </ElmHeading>
           <ElmParagraph>
-            内閣府が公開する「国民の祝日」を、認証不要・CORS
-            対応の静的な JSON API として配信します。サーバーは不要で、URL
+            内閣府が公開する「国民の祝日」を、認証不要・CORS 対応の静的な JSON
+            API として配信します。サーバーは不要で、URL
             を叩くだけ。下のパネルは、この API
             から取得したデータで「今日が祝日かどうか」を判定しています。
           </ElmParagraph>
@@ -210,6 +212,28 @@ function App() {
               <span className="stat-label">データ提供</span>
             </div>
           </div>
+        </section>
+
+        <ElmDivider />
+
+        <section className="section">
+          <span className="eyebrow mono">UPCOMING</span>
+          <ElmHeading level={2}>次の祝日</ElmHeading>
+          <ul className="upcoming">
+            {upcoming.map((h) => (
+              <li key={h.key} className="holiday-row">
+                <span
+                  className="dot"
+                  data-substitute={h.name === "休日"}
+                  aria-hidden="true"
+                />
+                <span className="holiday-date mono">{formatShort(h.date)}</span>
+                <span className="holiday-name display">
+                  <HolidayName name={h.name} />
+                </span>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <ElmDivider />
@@ -269,21 +293,34 @@ function App() {
 
           <ElmTabs defaultValue="fetch">
             <ElmTabList>
-              <ElmTab value="fetch">fetch (JS)</ElmTab>
-              <ElmTab value="curl">curl</ElmTab>
-              <ElmTab value="response">レスポンス</ElmTab>
+              <ElmTab value="fetch">
+                <ElmLanguageIcon language="ts" />
+                &nbsp;fetch API
+              </ElmTab>
+              <ElmTab value="curl">
+                <ElmLanguageIcon language="bash" />
+                &nbsp;curl
+              </ElmTab>
+              <ElmTab value="response">
+                <ElmLanguageIcon language="json" />
+                &nbsp;レスポンス
+              </ElmTab>
             </ElmTabList>
-            <ElmTabPanel value="fetch">
+            <ElmTabPanel value="fetch" className="margin-zero">
               <ElmCodeBlock
                 code={FETCH_EXAMPLE}
                 language="typescript"
                 caption="2026 年の祝日を取得"
               />
             </ElmTabPanel>
-            <ElmTabPanel value="curl">
-              <ElmCodeBlock code={CURL_EXAMPLE} language="bash" caption="curl" />
+            <ElmTabPanel value="curl" className="margin-zero">
+              <ElmCodeBlock
+                code={CURL_EXAMPLE}
+                language="bash"
+                caption="curl"
+              />
             </ElmTabPanel>
-            <ElmTabPanel value="response">
+            <ElmTabPanel value="response" className="margin-zero">
               <ElmCodeBlock
                 code={RESPONSE_EXAMPLE}
                 language="json"
@@ -291,28 +328,6 @@ function App() {
               />
             </ElmTabPanel>
           </ElmTabs>
-        </section>
-
-        <ElmDivider />
-
-        <section className="section">
-          <span className="eyebrow mono">UPCOMING</span>
-          <ElmHeading level={2}>近くの祝日</ElmHeading>
-          <ul className="upcoming">
-            {upcoming.map((h) => (
-              <li key={h.key} className="holiday-row">
-                <span
-                  className="dot"
-                  data-substitute={h.name === "休日"}
-                  aria-hidden="true"
-                />
-                <span className="holiday-date mono">{formatShort(h.date)}</span>
-                <span className="holiday-name display">
-                  <HolidayName name={h.name} />
-                </span>
-              </li>
-            ))}
-          </ul>
         </section>
 
         <ElmDivider />
