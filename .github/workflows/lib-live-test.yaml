@@ -1,0 +1,27 @@
+name: Live Test (crates/jp-holidays-lib)
+
+# Exercises the network `fetch` path against the Cabinet Office endpoint.
+# Runs on a schedule and on demand only — it must NOT gate PR merges, since it
+# can fail for reasons unrelated to the diff (upstream outage, network).
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  live:
+    name: Live Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Rust Toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Run Live Tests
+        run: cargo test -p jp-holidays-lib --features fetch -- --ignored

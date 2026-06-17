@@ -2,14 +2,18 @@
 name = "jp-holidays-lib"
 description = "Japanese holiday library for working with public holiday data in Rust."
 version = "2.0.0"
-edition = "2024"
-authors = ["Ikuma Yamashita"]
-repository = "https://github.com/46ki75/jp-holidays"
-license = "MIT"
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+repository.workspace = true
+license.workspace = true
 documentation = "https://docs.rs/jp-holidays-lib"
 categories = ["date-and-time", "internationalization", "data-structures"]
 keywords = ["japan", "holiday", "calendar", "datetime", "localization"]
 readme = "README.md"
+
+[lints]
+workspace = true
 
 [features]
 default = []
@@ -18,15 +22,15 @@ default = []
 fetch = ["dep:reqwest", "dep:encoding_rs"]
 
 [dependencies]
-chrono = "0.4.41"
-thiserror = "2.0.12"
+chrono = { workspace = true }
+thiserror = { workspace = true }
 encoding_rs = { version = "0.8.35", optional = true }
 reqwest = { version = "0.12.15", features = [
     "rustls-tls",
 ], default-features = false, optional = true }
 
 [dev-dependencies]
-tokio = { version = "1.44.2", features = ["full"] }
+tokio = { workspace = true }
 
 [package.metadata.docs.rs]
 all-features = true

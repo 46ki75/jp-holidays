@@ -1,3 +1,20 @@
 [workspace]
 resolver = "3"
-members = ["crates/jp-holidays-lib"]
+members = ["crates/*"]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.85"
+license = "MIT"
+authors = ["Ikuma Yamashita"]
+repository = "https://github.com/46ki75/jp-holidays"
+
+[workspace.dependencies]
+chrono = "0.4.41"
+thiserror = "2.0.12"
+tokio = { version = "1.44.2", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[workspace.lints.clippy]
+unwrap_used = "deny"

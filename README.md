@@ -1,60 +1,38 @@
-# template-devcontainer
+# jp-holidays
+
+日本の祝日（内閣府公開データ）を扱うための Rust ワークスペースです。
+
+| クレート                                       | 種別       | 内容                                                                 |
+| ---------------------------------------------- | ---------- | -------------------------------------------------------------------- |
+| [`jp-holidays-lib`](./crates/jp-holidays-lib/) | ライブラリ | 祝日判定 API。データを同梱し、`fetch` フィーチャで最新取得も可能。    |
+| [`jp-holidays`](./crates/jp-holidays/)         | バイナリ   | 静的 JSON API を生成し、GitHub Pages へ公開するジェネレーター。       |
+
+## 静的 HTTP API
+
+`jp-holidays` ジェネレーターが内閣府データを取得し、静的 JSON として GitHub Pages に公開します。
+認証不要・CORS 対応で、任意のクライアントから直接取得できます。
+
+ベース URL: `https://46ki75.github.io/jp-holidays/`
+
+| パス                     | 内容                                       |
+| ------------------------ | ------------------------------------------ |
+| `/api/v1/holidays.json`  | 全期間の祝日（日付キーのマップ）           |
+| `/api/v1/{year}.json`    | 指定した年の祝日                           |
+| `/api/v1/years.json`     | 利用可能な年の一覧とメタデータ             |
+
+```js
+const res = await fetch("https://46ki75.github.io/jp-holidays/api/v1/2025.json");
+const holidays = await res.json();
+console.log(holidays["2025-01-01"]); // "元日"
+```
+
+## 開発
+
+タスクは [`just`](https://github.com/casey/just) で実行します。
 
 ```bash
-npx degit 46ki75/template-devcontainer
+just            # レシピ一覧
+just ci         # fmt-check + clippy + ハーメティックテスト
+just test-live  # ネットワークを伴う live テスト
+just build-site # ./dist に静的サイトを生成
 ```
-
-## Custom Features for Local Development
-
-Create a directory at `.devcontainer/features/<YOUR_FEATURE_NAME>` containing following files:
-
-- `devcontainer-feature.json`: Metadata describing the feature.
-- `install.sh`: Shell script to install the feature.
-
-### `devcontainer-feature.json`
-
-- `id`: Identifier for this feature.
-- `installAfter`: Specifies dependencies that must be installed before this feature.
-- `customizations.vscode`: VSCode settings and extensions to apply when this features is used.
-
-```json
-{
-  "id": "cargo-binstall",
-  "name": "cargo-binstall (via cargo)",
-  "version": "1.0.0",
-  "customizations": {
-    "vscode": {
-      "settings": {
-        "[rust]": { "editor.defaultFormatter": "rust-lang.rust-analyzer" }
-      },
-      "extensions": ["rust-lang.rust-analyzer"]
-    }
-  },
-  "installsAfter": ["ghcr.io/devcontainers/features/rust"]
-}
-```
-
-### `install.sh`
-
-Dev Container features are defined using simple shell scripts.
-
-```bash
-#!/bin/bash
-
-set -e -u -o pipefail
-
-USERNAME="${USERNAME:-"vscode"}"
-
-su "${USERNAME}" -c "curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash"
-su "${USERNAME}" -c "cargo binstall just cargo-lambda --no-confirm"
-
-echo "Done!"
-
-# Add your custom installation steps below ---
-```
-
-### Need More Information?
-
-Exploring the actual implementations in [Available Dev Container Features](https://containers.dev/features) is the best way to learn how to create your own.
-
-For detailed specifications, see the [Dev Container metadata reference](https://containers.dev/implementors/json_reference/).

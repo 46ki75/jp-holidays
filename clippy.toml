@@ -1,0 +1,2 @@
+# Allow `.unwrap()` in tests despite the workspace-wide `unwrap_used = "deny"`.
+allow-unwrap-in-tests = true

@@ -7,5 +7,9 @@
 target/
 __tmp.rs
 
+# Generated static site (jp-holidays)
+/dist/
+lcov.info
+
 # Node.js
 .pnpm-store/

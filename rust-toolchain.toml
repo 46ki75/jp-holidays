@@ -1,0 +1,7 @@
+# Tracks current stable so local builds and rust-analyzer use a matching
+# proc-macro ABI. The MSRV (workspace `rust-version`) is enforced separately by
+# the `msrv` CI job (`cargo +<MSRV> check`), not by pinning this file to it.
+[toolchain]
+channel = "stable"
+components = ["rustfmt", "clippy"]
+profile = "minimal"
