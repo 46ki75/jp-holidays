@@ -14,9 +14,11 @@ lint:
 test:
     cargo test --workspace
 
-# Live tier: exercises the network `fetch` path (jp-holidays-lib `fetch` feature).
+# Live tier: exercises the network `fetch` path (jp-holidays-lib `fetch`
+# feature) plus the generator rendering live-fetched data end-to-end.
 test-live:
     cargo test -p jp-holidays-lib --features fetch -- --ignored
+    cargo test -p jp-holidays -- --ignored
 
 # Instrumented hermetic test run (no report yet).
 test-cov:
