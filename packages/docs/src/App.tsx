@@ -163,7 +163,7 @@ function TodayPanel({
   );
 }
 
-function YearPanel({
+export function YearPanel({
   holidays,
   today,
 }: {
