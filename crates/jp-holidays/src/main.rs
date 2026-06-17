@@ -19,12 +19,19 @@ use chrono::Datelike;
 use clap::Parser;
 use jp_holidays_lib::Client;
 use serde::Serialize;
+use utoipa::{OpenApi, ToSchema};
 
 /// Source of the holiday data, recorded in `years.json`.
 const SOURCE_URL: &str = "https://www8.cao.go.jp/chosei/shukujitsu/syukujitsu.csv";
 
+/// Public base URL of the deployed API (GitHub Pages).
+const BASE_URL: &str = "https://46ki75.github.io/jp-holidays";
+
 /// Landing page documenting the static API.
 const INDEX_HTML: &str = include_str!("index.html");
+
+/// Scalar API reference page (loads `openapi.json`).
+const DOCS_HTML: &str = include_str!("docs.html");
 
 #[derive(Parser)]
 #[command(about = "Generate the static jp-holidays JSON API", version)]
@@ -35,17 +42,81 @@ struct Args {
 }
 
 /// The `api/v1/years.json` index document.
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 struct YearsIndex {
     /// All years that have at least one holiday, ascending.
+    #[schema(example = json!([1955, 1956, 2025]))]
     years: Vec<i32>,
     /// Total number of holidays across all years.
+    #[schema(example = 1067)]
     count: usize,
     /// Upstream source of the data.
-    source: &'static str,
+    #[schema(example = "https://www8.cao.go.jp/chosei/shukujitsu/syukujitsu.csv")]
+    source: String,
     /// RFC 3339 timestamp of when the site was generated.
+    #[schema(example = "2026-01-01T00:00:00+00:00")]
     generated_at: String,
 }
+
+/// OpenAPI specification for the static jp-holidays API.
+#[derive(OpenApi)]
+#[openapi(
+    info(
+        title = "jp-holidays API",
+        version = "1.0.0",
+        description = "内閣府公開データに基づく日本の祝日の静的 JSON API。認証不要・CORS 対応。",
+        license(name = "MIT")
+    ),
+    servers((url = BASE_URL, description = "GitHub Pages")),
+    paths(spec_holidays, spec_year, spec_years),
+    components(schemas(YearsIndex)),
+    tags((name = "holidays", description = "祝日データ"))
+)]
+struct ApiDoc;
+
+// The functions below exist only to carry `#[utoipa::path]` annotations; they
+// are never called (the API is served as static files), so dead-code is allowed.
+
+/// 全期間の祝日（日付キーのマップ）を取得します。
+#[utoipa::path(
+    get,
+    path = "/api/v1/holidays.json",
+    tag = "holidays",
+    responses((
+        status = 200,
+        description = "日付 (`YYYY-MM-DD`) から祝日名へのマップ",
+        body = std::collections::HashMap<String, String>,
+        example = json!({"2025-01-01": "元日", "2025-01-13": "成人の日"})
+    ))
+)]
+#[allow(dead_code)]
+fn spec_holidays() {}
+
+/// 指定した年の祝日を取得します。
+#[utoipa::path(
+    get,
+    path = "/api/v1/{year}.json",
+    tag = "holidays",
+    params(("year" = i32, Path, description = "西暦（例: 2025）", example = 2025)),
+    responses((
+        status = 200,
+        description = "指定年の日付 (`YYYY-MM-DD`) から祝日名へのマップ",
+        body = std::collections::HashMap<String, String>,
+        example = json!({"2025-01-01": "元日"})
+    ))
+)]
+#[allow(dead_code)]
+fn spec_year() {}
+
+/// 利用可能な年の一覧とメタデータを取得します。
+#[utoipa::path(
+    get,
+    path = "/api/v1/years.json",
+    tag = "holidays",
+    responses((status = 200, description = "年の一覧とメタデータ", body = YearsIndex))
+)]
+#[allow(dead_code)]
+fn spec_years() {}
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -103,10 +174,17 @@ fn render(client: &Client, generated_at: String) -> Vec<(PathBuf, String)> {
     let index = YearsIndex {
         years: by_year.keys().copied().collect(),
         count: all.len(),
-        source: SOURCE_URL,
+        source: SOURCE_URL.to_string(),
         generated_at,
     };
     files.push((PathBuf::from("api/v1/years.json"), to_json(&index)));
+
+    // OpenAPI spec + Scalar API reference page.
+    files.push((
+        PathBuf::from("api/v1/openapi.json"),
+        to_json(&ApiDoc::openapi()),
+    ));
+    files.push((PathBuf::from("api/v1/docs.html"), DOCS_HTML.to_string()));
 
     files.push((PathBuf::from(".nojekyll"), String::new()));
     files.push((PathBuf::from("index.html"), INDEX_HTML.to_string()));
@@ -139,8 +217,25 @@ mod tests {
         assert!(files.contains_key(&PathBuf::from("api/v1/holidays.json")));
         assert!(files.contains_key(&PathBuf::from("api/v1/years.json")));
         assert!(files.contains_key(&PathBuf::from("api/v1/1955.json")));
+        assert!(files.contains_key(&PathBuf::from("api/v1/openapi.json")));
+        assert!(files.contains_key(&PathBuf::from("api/v1/docs.html")));
         assert!(files.contains_key(&PathBuf::from(".nojekyll")));
         assert!(files.contains_key(&PathBuf::from("index.html")));
+    }
+
+    #[test]
+    fn openapi_spec_is_valid_and_documents_the_endpoints() {
+        let files = files();
+        let spec: serde_json::Value =
+            serde_json::from_str(&files[&PathBuf::from("api/v1/openapi.json")]).unwrap();
+
+        assert_eq!(spec["openapi"].as_str().unwrap().chars().next(), Some('3'));
+        assert_eq!(spec["info"]["title"].as_str().unwrap(), "jp-holidays API");
+        let paths = &spec["paths"];
+        assert!(paths.get("/api/v1/holidays.json").is_some());
+        assert!(paths.get("/api/v1/{year}.json").is_some());
+        assert!(paths.get("/api/v1/years.json").is_some());
+        assert!(spec["components"]["schemas"]["YearsIndex"].is_object());
     }
 
     #[test]

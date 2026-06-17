@@ -19,6 +19,8 @@
 | `/api/v1/holidays.json`  | 全期間の祝日（日付キーのマップ）           |
 | `/api/v1/{year}.json`    | 指定した年の祝日                           |
 | `/api/v1/years.json`     | 利用可能な年の一覧とメタデータ             |
+| `/api/v1/openapi.json`   | OpenAPI 3.1 仕様                            |
+| `/api/v1/docs.html`      | Scalar による API リファレンス             |
 
 ```js
 const res = await fetch("https://46ki75.github.io/jp-holidays/api/v1/2025.json");
