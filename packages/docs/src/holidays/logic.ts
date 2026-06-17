@@ -78,6 +78,12 @@ export function upcomingHolidays(
     .slice(0, count);
 }
 
+/** Every holiday in a given calendar year, chronologically. */
+export function holidaysInYear(holidays: Holidays, year: number): HolidayEntry[] {
+  const prefix = `${year}-`;
+  return sortedEntries(holidays).filter((entry) => entry.key.startsWith(prefix));
+}
+
 export interface HolidayStats {
   count: number;
   minYear: number;

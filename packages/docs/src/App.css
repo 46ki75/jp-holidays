@@ -259,6 +259,83 @@
   color: var(--elmethis-color-neutral-strong);
 }
 
+/* ── year register ─────────────────────────────────────── */
+.year-nav {
+  width: 100%;
+  margin-block-start: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+.year-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 0.5rem;
+  background-color: transparent;
+  color: var(--elmethis-color-neutral);
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+.year-btn:hover:not(:disabled) {
+  color: var(--elmethis-color-primary);
+  border-color: var(--elmethis-color-primary);
+}
+.year-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.year-value {
+  min-width: 4.5ch;
+  text-align: center;
+  font-size: 1.85rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--elmethis-color-neutral-strong);
+  font-variant-numeric: tabular-nums;
+}
+.year-count {
+  margin: 0.85rem 0 0;
+  font-size: 0.85rem;
+  color: var(--elmethis-color-neutral);
+}
+.year-grid {
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 2.75rem;
+  animation: fade 0.35s ease both;
+}
+/* keep every row ruled, including the last in each column */
+.year-grid .holiday-row:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+.holiday-row[data-past="true"] {
+  opacity: 0.45;
+}
+.holiday-row[data-today="true"] .holiday-name {
+  color: var(--accent-holiday);
+}
+.holiday-row[data-today="true"] .dot {
+  box-shadow: 0 0 0 4px
+    color-mix(in srgb, var(--accent-holiday) 22%, transparent);
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(0.3rem);
+  }
+}
+
 /* reference cards */
 .links {
   display: grid;
@@ -316,6 +393,9 @@ a:focus-visible,
 }
 @media (max-width: 640px) {
   .links {
+    grid-template-columns: 1fr;
+  }
+  .year-grid {
     grid-template-columns: 1fr;
   }
   .today {

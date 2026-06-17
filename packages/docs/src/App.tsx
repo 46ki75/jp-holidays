@@ -22,6 +22,8 @@ import {
 import {
   mdiAlertOutline,
   mdiCheck,
+  mdiChevronLeft,
+  mdiChevronRight,
   mdiContentCopy,
   mdiEarth,
   mdiGithub,
@@ -33,8 +35,10 @@ import { READINGS } from "./holidays/data";
 import {
   formatLong,
   formatShort,
+  holidaysInYear,
   nextHoliday,
   statsFor,
+  toKey,
   upcomingHolidays,
   verdictFor,
 } from "./holidays/logic";
@@ -159,6 +163,85 @@ function TodayPanel({
   );
 }
 
+function YearPanel({
+  holidays,
+  today,
+}: {
+  holidays: Record<string, string>;
+  today: Date;
+}) {
+  const { minYear, maxYear } = statsFor(holidays);
+  const [year, setYear] = useState(() => today.getFullYear());
+
+  // The dataset range can grow when the live data loads; keep the shown year
+  // inside it so the stepper never points at an empty year.
+  const shown = Math.min(Math.max(year, minYear), maxYear);
+  const list = holidaysInYear(holidays, shown);
+  const todayKey = toKey(today);
+  const step = (delta: number) =>
+    setYear((y) => Math.min(Math.max(y + delta, minYear), maxYear));
+
+  return (
+    <section className="section">
+      <div>
+        <span className="eyebrow mono">CALENDAR</span>
+        <ElmHeading level={2} className="margin-zero">
+          年間の祝日
+        </ElmHeading>
+      </div>
+
+      <div className="year-nav" role="group" aria-label="表示する年">
+        <button
+          type="button"
+          className="year-btn"
+          onClick={() => step(-1)}
+          disabled={shown <= minYear}
+          aria-label="前の年"
+        >
+          <ElmMdiIcon d={mdiChevronLeft} size="1.5rem" />
+        </button>
+        <span className="year-value mono" aria-live="polite">
+          {shown}
+        </span>
+        <button
+          type="button"
+          className="year-btn"
+          onClick={() => step(1)}
+          disabled={shown >= maxYear}
+          aria-label="次の年"
+        >
+          <ElmMdiIcon d={mdiChevronRight} size="1.5rem" />
+        </button>
+      </div>
+
+      <p className="year-count">
+        {shown} 年の祝日は <span className="mono">{list.length}</span> 日です。
+      </p>
+
+      <ul key={shown} className="year-grid">
+        {list.map((h) => (
+          <li
+            key={h.key}
+            className="holiday-row"
+            data-past={h.key < todayKey}
+            data-today={h.key === todayKey}
+          >
+            <span
+              className="dot"
+              data-substitute={h.name === "休日"}
+              aria-hidden="true"
+            />
+            <span className="holiday-date mono">{formatShort(h.date)}</span>
+            <span className="holiday-name display">
+              <HolidayName name={h.name} />
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function App() {
   const { holidays, live } = useHolidays();
   const [time] = useState(detectTimeInfo);
@@ -235,6 +318,10 @@ function App() {
             ))}
           </ul>
         </section>
+
+        <ElmDivider />
+
+        <YearPanel holidays={holidays} today={time.today} />
 
         <ElmDivider />
 
