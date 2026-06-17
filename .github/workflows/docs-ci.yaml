@@ -38,7 +38,7 @@ jobs:
           - name: Lint CSS
             command: pnpm run lint.css
           - name: Test
-            command: pnpm run test
+            command: pnpm run test.coverage
           - name: Build Check
             command: pnpm run build
 
@@ -65,3 +65,14 @@ jobs:
 
       - name: ${{ matrix.name }}
         run: ${{ matrix.command }}
+
+      - name: Upload coverage to Codecov
+        if: matrix.name == 'Test'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          working-directory: packages/docs
+          files: coverage/lcov.info
+          flags: docs
+          disable_search: true
+          fail_ci_if_error: false

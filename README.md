@@ -1,5 +1,7 @@
 # jp-holidays
 
+[![codecov](https://codecov.io/gh/46ki75/jp-holidays/graph/badge.svg)](https://codecov.io/gh/46ki75/jp-holidays)
+
 日本の祝日（内閣府公開データ）を扱うためのモノレポです。
 
 | パッケージ                                     | 種別             | 内容                                                                 |

@@ -1,0 +1,44 @@
+# Two coverage sources are uploaded under distinct flags:
+#   rust — cargo-llvm-cov over the workspace (ci.yaml)
+#   docs — vitest v8 over packages/docs (docs-ci.yaml)
+#
+# Each CI workflow is path-filtered, so a commit may upload only one flag.
+# carryforward keeps a flag's last known coverage when its workflow didn't run,
+# preventing spurious "coverage dropped" reports.
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        target: auto
+        threshold: 1%
+
+flag_management:
+  default_rules:
+    carryforward: true
+  individual_flags:
+    - name: rust
+      paths:
+        - crates/
+    - name: docs
+      paths:
+        - packages/docs/
+
+component_management:
+  individual_components:
+    - component_id: rust
+      name: Rust
+      paths:
+        - crates/**
+    - component_id: docs
+      name: Docs
+      paths:
+        - packages/docs/**
+
+comment:
+  layout: "header, flags, components, files"
+  require_changes: true
