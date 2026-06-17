@@ -50,3 +50,9 @@ build-site: build-docs
     cargo run -p jp-holidays -- --out-dir packages/docs/dist
 
 ci: fmt-check lint test
+
+check-pnpm: 
+    pnpm run -r check
+
+[parallel]
+check: ci check-pnpm

@@ -3,5 +3,5 @@
 # the `msrv` CI job (`cargo +<MSRV> check`), not by pinning this file to it.
 [toolchain]
 channel = "stable"
-components = ["rustfmt", "clippy"]
+components = ["rustfmt", "clippy", "rust-analyzer"]
 profile = "minimal"
