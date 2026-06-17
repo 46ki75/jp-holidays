@@ -42,6 +42,11 @@ import {
   upcomingHolidays,
   verdictFor,
 } from "./holidays/logic";
+import fetchExample from "./examples/fetch.js?raw";
+import curlExample from "./examples/curl.sh?raw";
+import pythonExample from "./examples/requests.py?raw";
+import reqwestExample from "./examples/reqwest.rs?raw";
+import libExample from "./examples/lib.rs?raw";
 import "./App.css";
 
 const REPO = "https://github.com/46ki75/jp-holidays";
@@ -55,26 +60,14 @@ const ENDPOINTS = [
   { path: "/api/v1/openapi.json", desc: "OpenAPI 3.1 仕様" },
 ] as const;
 
-const FETCH_EXAMPLE = `const res = await fetch(
-  "${BASE}/api/v1/2026.json",
-);
-const holidays = await res.json();
-
-// 日付（YYYY-MM-DD）から祝日名を引く
-holidays["2026-01-01"]; // "元日"
-holidays["2026-07-20"]; // "海の日"
-holidays["2026-06-17"]; // undefined（平日）`;
-
-const CURL_EXAMPLE = `curl -s ${BASE}/api/v1/2026.json`;
-
-const RESPONSE_EXAMPLE = `{
-  "2026-01-01": "元日",
-  "2026-01-12": "成人の日",
-  "2026-02-11": "建国記念の日",
-  "2026-02-23": "天皇誕生日",
-  "2026-03-20": "春分の日",
-  "2026-04-29": "昭和の日"
-}`;
+// Examples live as standalone source files (real syntax highlighting in the
+// editor) and are inlined at build time via Vite's `?raw` import. trimEnd drops
+// each file's trailing newline so the code block renders flush.
+const FETCH_EXAMPLE = fetchExample.trimEnd();
+const CURL_EXAMPLE = curlExample.trimEnd();
+const PYTHON_EXAMPLE = pythonExample.trimEnd();
+const REQWEST_EXAMPLE = reqwestExample.trimEnd();
+const LIB_EXAMPLE = libExample.trimEnd();
 
 function CopyButton({ value, label }: { value: string; label: string }) {
   const [copied, setCopied] = useState(false);
@@ -388,9 +381,17 @@ function App() {
                 <ElmLanguageIcon language="bash" />
                 &nbsp;curl
               </ElmTab>
-              <ElmTab value="response">
-                <ElmLanguageIcon language="json" />
-                &nbsp;レスポンス
+              <ElmTab value="python">
+                <ElmLanguageIcon language="python" />
+                &nbsp;Python
+              </ElmTab>
+              <ElmTab value="reqwest">
+                <ElmLanguageIcon language="rust" />
+                &nbsp;Rust (reqwest)
+              </ElmTab>
+              <ElmTab value="lib">
+                <ElmLanguageIcon language="rust" />
+                &nbsp;Rust (lib)
               </ElmTab>
             </ElmTabList>
             <ElmTabPanel value="fetch" className="margin-zero">
@@ -407,11 +408,25 @@ function App() {
                 caption="curl"
               />
             </ElmTabPanel>
-            <ElmTabPanel value="response" className="margin-zero">
+            <ElmTabPanel value="python" className="margin-zero">
               <ElmCodeBlock
-                code={RESPONSE_EXAMPLE}
-                language="json"
-                caption="api/v1/2026.json（抜粋）"
+                code={PYTHON_EXAMPLE}
+                language="python"
+                caption="requests で 2026 年の祝日を取得"
+              />
+            </ElmTabPanel>
+            <ElmTabPanel value="reqwest" className="margin-zero">
+              <ElmCodeBlock
+                code={REQWEST_EXAMPLE}
+                language="rust"
+                caption="reqwest で 2026 年の祝日を取得"
+              />
+            </ElmTabPanel>
+            <ElmTabPanel value="lib" className="margin-zero">
+              <ElmCodeBlock
+                code={LIB_EXAMPLE}
+                language="rust"
+                caption="jp-holidays-lib クレートを直接使う"
               />
             </ElmTabPanel>
           </ElmTabs>
