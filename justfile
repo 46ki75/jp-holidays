@@ -54,5 +54,7 @@ ci: fmt-check lint test
 check-pnpm: 
     pnpm run -r check
 
+check-rust: fmt-check lint
+
 [parallel]
-check: ci check-pnpm
+check: check-rust check-pnpm

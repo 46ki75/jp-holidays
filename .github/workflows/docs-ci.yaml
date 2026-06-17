@@ -15,6 +15,11 @@ on:
       - ".github/workflows/docs-ci.yaml"
   workflow_dispatch:
 
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: docs-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   docs:
     name: ${{ matrix.name }}
