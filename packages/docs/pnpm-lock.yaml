@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@elmethis/core':
-        specifier: ^0.13.0
-        version: 0.13.0(@a2ui/web_core@0.9.2)(zod@4.4.3)
+        specifier: ^0.14.0
+        version: 0.14.0(@a2ui/web_core@0.9.2)(zod@4.4.3)
       '@elmethis/react':
-        specifier: ^0.9.0
-        version: 0.9.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: ^0.10.0
+        version: 0.10.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@js-temporal/polyfill':
         specifier: ^0.5.1
         version: 0.5.1
@@ -21,14 +21,14 @@ importers:
         specifier: ^7.4.47
         version: 7.4.47
       react:
-        specifier: ^19.2.6
+        specifier: ^19.2.7
         version: 19.2.7
       react-dom:
-        specifier: ^19.2.6
+        specifier: ^19.2.7
         version: 19.2.7(react@19.2.7)
     devDependencies:
       '@babel/core':
-        specifier: ^7.29.0
+        specifier: ^7.29.7
         version: 7.29.7
       '@eslint/js':
         specifier: ^10.0.1
@@ -40,40 +40,40 @@ importers:
         specifier: ^7.20.5
         version: 7.20.5
       '@types/node':
-        specifier: ^24.12.3
+        specifier: ^24.13.2
         version: 24.13.2
       '@types/react':
-        specifier: ^19.2.14
+        specifier: ^19.2.17
         version: 19.2.17
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.17)
       '@vitejs/plugin-react':
-        specifier: ^6.0.1
+        specifier: ^6.0.2
         version: 6.0.2(@rolldown/plugin-babel@0.2.3(@babel/core@7.29.7)(rolldown@1.0.3)(vite@8.0.16(@types/node@24.13.2)))(babel-plugin-react-compiler@1.0.0)(vite@8.0.16(@types/node@24.13.2))
       babel-plugin-react-compiler:
         specifier: ^1.0.0
         version: 1.0.0
       eslint:
-        specifier: ^10.3.0
+        specifier: ^10.5.0
         version: 10.5.0
       eslint-plugin-react-hooks:
         specifier: ^7.1.1
         version: 7.1.1(eslint@10.5.0)
       eslint-plugin-react-refresh:
-        specifier: ^0.5.2
+        specifier: ^0.5.3
         version: 0.5.3(eslint@10.5.0)
       globals:
         specifier: ^17.6.0
         version: 17.6.0
       typescript:
-        specifier: ~6.0.2
+        specifier: ~6.0.3
         version: 6.0.3
       typescript-eslint:
-        specifier: ^8.59.2
+        specifier: ^8.61.1
         version: 8.61.1(eslint@10.5.0)(typescript@6.0.3)
       vite:
-        specifier: ^8.0.12
+        specifier: ^8.0.16
         version: 8.0.16(@types/node@24.13.2)
 
 packages:
@@ -164,15 +164,15 @@ packages:
     resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
 
-  '@elmethis/core@0.13.0':
-    resolution: {integrity: sha512-1DpJybbo+REUjN48d6b74xly5huaa/5LkDsZB+XJs4943fBVRi5tEt8RTxS+bR9BlrdxnF4ICR22vnGUe2u/xg==}
+  '@elmethis/core@0.14.0':
+    resolution: {integrity: sha512-3M0+QStiDONc84t31J+04r0w+6dgVdhKLL2sH3Ue3hB6YD5l6W8RO9xZXk/twJzM0aQ9QcuBjdGbkKeK1jxN+Q==}
     engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
     peerDependencies:
       '@a2ui/web_core': '>=0.10.0'
       zod: ^3
 
-  '@elmethis/react@0.9.0':
-    resolution: {integrity: sha512-3RFHTYfm090z5+HvJ1vTWPmGY2+hxWkq4SpeJflc2/HxJ3PC3aZ45Wi9wREbXvNzkVHwiC9Kp4cjXwY9FV8vag==}
+  '@elmethis/react@0.10.0':
+    resolution: {integrity: sha512-d8opvpFsaYa1lvOPdjzSpTweEVZfmYsZJzNuLvrscQjm6OE2uqj3k3ZGI2sfYkUHnjg6CcRO+QBZNux1qCgM8A==}
     engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
     peerDependencies:
       react: '>=19'
@@ -1398,24 +1398,24 @@ snapshots:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
 
-  '@elmethis/core@0.13.0(@a2ui/web_core@0.9.2)(zod@3.25.76)':
+  '@elmethis/core@0.14.0(@a2ui/web_core@0.9.2)(zod@3.25.76)':
     dependencies:
       '@a2ui/web_core': 0.9.2
       zod: 3.25.76
       zod-to-json-schema: 3.25.2(zod@3.25.76)
 
-  '@elmethis/core@0.13.0(@a2ui/web_core@0.9.2)(zod@4.4.3)':
+  '@elmethis/core@0.14.0(@a2ui/web_core@0.9.2)(zod@4.4.3)':
     dependencies:
       '@a2ui/web_core': 0.9.2
       zod: 4.4.3
       zod-to-json-schema: 3.25.2(zod@4.4.3)
 
-  '@elmethis/react@0.9.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@elmethis/react@0.10.0(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@46ki75/ikuma-theme': 0.0.10
       '@a2ui/react': 0.9.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@3.25.76)
       '@a2ui/web_core': 0.9.2
-      '@elmethis/core': 0.13.0(@a2ui/web_core@0.9.2)(zod@3.25.76)
+      '@elmethis/core': 0.14.0(@a2ui/web_core@0.9.2)(zod@3.25.76)
       '@formkit/auto-animate': 0.9.0
       '@mdi/js': 7.4.47
       '@radix-ui/react-use-controllable-state': 1.2.3(@types/react@19.2.17)(react@19.2.7)
